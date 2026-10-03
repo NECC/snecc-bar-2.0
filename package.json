@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "postinstall": "prisma generate"
   },
   "engines": {
     "node": ">=20.9.0"
@@ -15,15 +16,24 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@auth/prisma-adapter": "^2.11.3",
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^7.10.0",
+    "@prisma/extension-accelerate": "^3.0.1",
+    "@tailwindcss/postcss": "^4.3.3",
+    "dotenv": "^18.0.5",
     "next": "16.2.4",
+    "next-auth": "^5.0.0-beta.32",
     "react": "19.2.5",
     "react-dom": "19.2.5",
-    "react-markdown": "10.1.0"
+    "react-markdown": "10.1.0",
+    "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
     "@types/node": "24.10.1",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
+    "prisma": "^7.10.0",
     "typescript": "6.0.3"
   }
 }

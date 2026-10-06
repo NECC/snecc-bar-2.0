@@ -52,7 +52,7 @@ export default function ProfileView({ user }: ProfileViewProps) {
           onClick={() => alert("Logout efetuado")} 
           className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-xs text-rose-600 bg-rose-50 hover:bg-rose-100 transition"
         >
-          <LogOut className="w-4 h-4" />
+          <LogOut className="w-4 h-4 hover:bg-red-500" />
           Terminar Sessão
         </button>
       </div>

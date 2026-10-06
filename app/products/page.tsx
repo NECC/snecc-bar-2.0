@@ -10,6 +10,7 @@ import { IoReceiptOutline } from "react-icons/io5";
 import Header from "@/components/header";
 import MobileFooter from "@/components/mobile-footer";
 
+
 const MOCK_PRODUCTS: Product[] = [
   {
     id: "1",
@@ -101,7 +102,7 @@ export default function HomePage() {
   // Handler para processar a compra individual
   const handleConfirmarCompra = (produto: Product) => {
     const preco = user.isSocio ? produto.precoSocio : produto.precoNaoSocio;
-
+    
     if (user.saldo < preco) {
       alert("Saldo insuficiente para efetuar esta compra!");
       return;

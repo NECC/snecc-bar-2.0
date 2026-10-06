@@ -1,6 +1,6 @@
 "use client";
 
-import { UtensilsCrossed, Receipt, CheckCircle2, LogOut } from "lucide-react";
+import { UtensilsCrossed, Receipt, CheckCircle2, LogOut, LayoutDashboard } from "lucide-react";
 import { LuUtensilsCrossed } from "react-icons/lu";
 import { IoReceiptOutline } from "react-icons/io5";
 import { signOutAction } from "@/app/actions/auth";
@@ -11,7 +11,8 @@ import SignOut from "./signOut";
 
 const pathsToNames: Record<string, string> = {
     "/products": "snacks",
-    "/orders": "pedidos" 
+    "/orders": "pedidos",
+    "/dashboard": "dashboard"
 }
 
 interface User {
@@ -66,6 +67,19 @@ export default function Header(userInterface: UserInterface) {
                     <IoReceiptOutline className="w-4 h-4 "/>
                     Pedidos
                 </button>
+
+                {/* Novo Botão para a Dashboard */}
+                <button
+                    onClick={() => router.push("/dashboard")}
+                    className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold transition ${
+                    abaAtiva === "dashboard"
+                        ? "bg-white text-blue-600 shadow-sm"
+                        : "text-slate-600 hover:text-slate-900"
+                    }`}
+                >
+                    <LayoutDashboard className="w-4 h-4" />
+                    Dashboard
+                </button>
                 </nav>
             </div>
     
@@ -88,7 +102,7 @@ export default function Header(userInterface: UserInterface) {
     
                 
                 <form action={signOutAction}>
-                    <button type="submit">
+                    <button type="submit" className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition">
                         <LogOut className="w-5 h-5" />
                     </button>
                 </form>

@@ -5,6 +5,8 @@ import { UtensilsCrossed, Receipt, CheckCircle2, LogOut } from "lucide-react";
 
 import CatalogView, { Product } from "@/components/catalog-view";
 import OrdersView from "@/components/orders-view";
+import { LuUtensilsCrossed } from "react-icons/lu";
+import { IoReceiptOutline } from "react-icons/io5";
 
 const MOCK_PRODUCTS: Product[] = [
   {
@@ -119,12 +121,9 @@ export default function HomePage() {
       <header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm px-4 md:px-8 py-3.5 flex items-center justify-between">
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-2.5">
-            <div className="bg-blue-600 text-white font-extrabold text-sm p-2 rounded-xl shadow-md shadow-blue-200">
-              sNECC
+            <div className="bg-blue-600 text-white font-extrabold text-bg p-2 rounded-xl shadow-md shadow-blue-200">
+              sNECC-Bar
             </div>
-            <span className="font-extrabold text-slate-900 text-xl tracking-tight">
-              Snack Catalog
-            </span>
           </div>
 
           <nav className="hidden md:flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
@@ -136,7 +135,7 @@ export default function HomePage() {
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              <UtensilsCrossed className="w-4 h-4" />
+              <LuUtensilsCrossed className="w-4 h-4"/>
               Snacks
             </button>
             <button
@@ -147,7 +146,7 @@ export default function HomePage() {
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              <Receipt className="w-4 h-4" />
+              <IoReceiptOutline className="w-4 h-4 "/>
               Pedidos
             </button>
           </nav>
@@ -193,7 +192,6 @@ export default function HomePage() {
         {abaAtiva === "pedidos" && (
           <OrdersView 
             compras={MOCK_COMPRAS} 
-            movimentosSaldo={MOCK_MOVIMENTOS_SALDO} 
           />
         )}
       </div>

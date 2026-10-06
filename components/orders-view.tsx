@@ -13,20 +13,12 @@ export interface CompraItem {
   estatutoNaAltura: string;
 }
 
-export interface MovimentoSaldoItem {
-  id: string;
-  type: "CARREGAR" | "RETIRAR";
-  montante: number;
-  responsavel: string;
-  data: string;
-}
 
 interface OrdersViewProps {
   compras: CompraItem[];
-  movimentosSaldo: MovimentoSaldoItem[];
 }
 
-export default function OrdersView({ compras, movimentosSaldo }: OrdersViewProps) {
+export default function OrdersView({ compras }: OrdersViewProps) {
   const [subAba, setSubAba] = useState<"compras" | "saldo">("compras");
 
   const formatarData = (isoString: string) => {
@@ -41,11 +33,8 @@ export default function OrdersView({ compras, movimentosSaldo }: OrdersViewProps
     <main className="flex-1 min-w-0 max-w-4xl mx-auto w-full">
       <div className="mb-6">
         <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
-          Histórico de Transações
+          Histórico
         </h1>
-        <p className="text-xs md:text-sm text-slate-500 mt-1">
-          Consulta as tuas compras de snacks e os movimentos no teu saldo
-        </p>
       </div>
 
       {/* Alternador */}
@@ -58,15 +47,6 @@ export default function OrdersView({ compras, movimentosSaldo }: OrdersViewProps
         >
           <Tag className="w-4 h-4" />
           Compras de Snacks
-        </button>
-        <button
-          onClick={() => setSubAba("saldo")}
-          className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 ${
-            subAba === "saldo" ? "bg-white text-blue-600 shadow-sm" : "text-slate-600 hover:text-slate-900"
-          }`}
-        >
-          <CreditCard className="w-4 h-4" />
-          Movimentos de Saldo
         </button>
       </div>
 
@@ -124,7 +104,7 @@ export default function OrdersView({ compras, movimentosSaldo }: OrdersViewProps
       )}
 
       {/* Movimentos de Saldo */}
-      {subAba === "saldo" && (
+      {/*{subAba === "saldo" && (
         <div className="space-y-3">
           {movimentosSaldo.map((item) => {
             const { data, hora } = formatarData(item.data);
@@ -166,7 +146,7 @@ export default function OrdersView({ compras, movimentosSaldo }: OrdersViewProps
             );
           })}
         </div>
-      )}
+      )}*/}
     </main>
   );
 }

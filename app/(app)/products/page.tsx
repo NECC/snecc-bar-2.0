@@ -1,77 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { UtensilsCrossed, Receipt, CheckCircle2, LogOut } from "lucide-react";
 
 import CatalogView, { Product } from "@/components/catalog-view";
-import OrdersView from "@/components/orders-view";
-import { LuUtensilsCrossed } from "react-icons/lu";
-import { IoReceiptOutline } from "react-icons/io5";
-import Header from "@/components/header";
-import MobileFooter from "@/components/mobile-footer";
 import { toast } from "sonner";
-
-
-const MOCK_PRODUCTS: Product[] = [
-  {
-    id: "1",
-    nome: "Água das Pedras",
-    preco: 1.00,
-    imagem: "https://images.unsplash.com/photo-1548839140-29a749e1bc4e?auto=format&fit=crop&q=80&w=400",
-  },
-  {
-    id: "2",
-    nome: "Gomas Fini",
-    preco: 0.75,
-    imagem: "https://images.unsplash.com/photo-1582058091505-f87a2e55a40f?auto=format&fit=crop&q=80&w=400",
-  },
-  {
-    id: "3",
-    nome: "Coca-Cola Zero",
-    preco: 0.90,
-    imagem: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=400",
-  },
-  {
-    id: "4",
-    nome: "Batatas Lays Recheadas",
-    preco: 0.85,
-    imagem: "https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&q=80&w=400",
-  },
-  {
-    id: "5",
-    nome: "Ice Tea Limão",
-    preco: 0.90,
-    imagem: "https://images.unsplash.com/photo-1556881286-fc6915169721?auto=format&fit=crop&q=80&w=400",
-  },
-  {
-    id: "6",
-    nome: "Snickers Original",
-    preco: 0.95,
-    imagem: "https://images.unsplash.com/photo-1599599810769-bcde5a160d32?auto=format&fit=crop&q=80&w=400",
-  },
-];
-
-const MOCK_COMPRAS = [
-  {
-    id: "tc-101",
-    produtoNome: "Gomas Fini",
-    produtoImagem: "https://images.unsplash.com/photo-1582058091505-f87a2e55a40f?auto=format&fit=crop&q=80&w=400",
-    bay: "BAY-02",
-    precoPago: 0.75,
-    data: "2026-10-06T10:30:00Z",
-    estatutoNaAltura: "Sócio",
-  },
-];
-
-const MOCK_MOVIMENTOS_SALDO = [
-  {
-    id: "tb-201",
-    type: "CARREGAR" as const,
-    montante: 10.00,
-    responsavel: "Admin João",
-    data: "2026-10-04T14:20:00Z",
-  },
-];
 
 export default function ProductsPage() {
   const [user, setUser] = useState({

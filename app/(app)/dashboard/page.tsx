@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Header from "@/components/header";
 import MobileFooter from "@/components/mobile-footer";
 import RechargeModal from "@/components/recharge-modal";
-import ProductModal from "@/components/product-modal";
+import ProductModal from "@/components/new-product-modal";
 import { 
   CreditCard, 
   TrendingUp, 
@@ -51,7 +51,6 @@ const RECENT_TRANSACTIONS = [
 
 export default function DashboardPage() {
   const [rechargeModalOpen, setRechargeModalOpen] = useState(false);
-  const [productModalOpen, setProductModalOpen] = useState(false);
 
   const [userData, setUserData] = useState<{
     isSocio: boolean;
@@ -102,13 +101,6 @@ export default function DashboardPage() {
             >
               <Plus className="w-4 h-4" />
               Carregar Saldo
-            </button>
-            <button 
-              onClick={() => setProductModalOpen(true)}
-              className="bg-white border border-slate-200 hover:bg-slate-50 active:scale-[0.98] text-slate-700 px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer"
-            >
-              <Package className="w-4 h-4" />
-              Gerir Stock
             </button>
           </div>
         </div>
@@ -174,12 +166,6 @@ export default function DashboardPage() {
         isOpen={rechargeModalOpen} 
         onClose={() => setRechargeModalOpen(false)} 
       />
-      
-      <ProductModal 
-        isOpen={productModalOpen} 
-        onClose={() => setProductModalOpen(false)} 
-      />
-
     </div>
   );
 }

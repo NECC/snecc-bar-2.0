@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { X, Package, Save, Loader2 } from "lucide-react";
-import { saveProductAction } from "@/app/actions/dashboard";
 import { toast } from "sonner";
 
 interface ProductModalProps {
@@ -10,13 +9,13 @@ interface ProductModalProps {
   onClose: () => void;
 }
 
-export default function ProductModal({ isOpen, onClose }: ProductModalProps) {
+export default function NewProductModal({ isOpen, onClose }: ProductModalProps) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     nome: "",
-    bay: "BAY-01",
     precoSocio: "",
     precoNaoSocio: "",
+    precoAquisicao: "",
     stock: "",
     imagem: "",
   });
@@ -27,30 +26,35 @@ export default function ProductModal({ isOpen, onClose }: ProductModalProps) {
     e.preventDefault();
     setLoading(true);
 
-    const res = await saveProductAction({
-      nome: formData.nome,
-      bay: formData.bay,
-      precoSocio: parseFloat(formData.precoSocio),
-      precoNaoSocio: parseFloat(formData.precoNaoSocio),
-      stock: parseInt(formData.stock, 10),
-      imagem: formData.imagem || undefined,
-    });
+    try {
+      const response = await fetch("/api/admin/products", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
-    setLoading(false);
+      if (!response.ok) {
+        throw new Error("Failed to create product");
+      }
 
-    if (res.success) {
-      toast.success(res.message);
+      const data = await response.json();
+      toast.success(data.message);
       setFormData({
         nome: "",
-        bay: "BAY-01",
         precoSocio: "",
         precoNaoSocio: "",
+        precoAquisicao: "",
         stock: "",
         imagem: "",
       });
       onClose();
-    } else {
-      toast.error(res.error || "Erro ao guardar o produto.");
+    } catch (error) {
+      console.error("Error creating product:", error);
+      toast.error("Error creating product");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -77,7 +81,7 @@ export default function ProductModal({ isOpen, onClose }: ProductModalProps) {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="gap-3">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Nome do Produto</label>
               <input
@@ -89,21 +93,9 @@ export default function ProductModal({ isOpen, onClose }: ProductModalProps) {
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-blue-600 focus:bg-white transition"
               />
             </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">BAY (Slot)</label>
-              <input
-                type="text"
-                required
-                placeholder="Ex: BAY-07"
-                value={formData.bay}
-                onChange={(e) => setFormData({ ...formData, bay: e.target.value })}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-blue-600 focus:bg-white transition"
-              />
-            </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 grid-rows-2 gap-3">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Preço Sócio (€)</label>
               <input
@@ -126,6 +118,19 @@ export default function ProductModal({ isOpen, onClose }: ProductModalProps) {
                 placeholder="1.00"
                 value={formData.precoNaoSocio}
                 onChange={(e) => setFormData({ ...formData, precoNaoSocio: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-blue-600 focus:bg-white transition"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Preço Aquisição (€)</label>
+              <input
+                type="number"
+                step="0.05"
+                required
+                placeholder="0.10"
+                value={formData.precoAquisicao}
+                onChange={(e) => setFormData({ ...formData, precoAquisicao: e.target.value })}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-blue-600 focus:bg-white transition"
               />
             </div>

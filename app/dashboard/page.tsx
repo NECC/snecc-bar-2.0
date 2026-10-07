@@ -1,7 +1,10 @@
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
+"use client";
+
+import { useState } from "react";
 import Header from "@/components/header";
 import MobileFooter from "@/components/mobile-footer";
+import RechargeModal from "@/components/recharge-modal";
+import ProductModal from "@/components/product-modal";
 import { 
   CreditCard, 
   TrendingUp, 
@@ -13,7 +16,6 @@ import {
   Package
 } from "lucide-react";
 
-// Novas Métricas Atualizadas
 const STATS = [
   { 
     label: "Total Saldo Utilizadores", 
@@ -47,16 +49,12 @@ const RECENT_TRANSACTIONS = [
   { id: "3", user: "Pedro Santos", type: "RETIRADA", amount: "-2.50€", date: "Ontem, 18:00", admin: "Admin João" },
 ];
 
-export default async function DashboardPage() {
-  const session = await auth();
+export default function DashboardPage() {
+  const [rechargeModalOpen, setRechargeModalOpen] = useState(false);
+  const [productModalOpen, setProductModalOpen] = useState(false);
 
-  if (!session || !session.user) {
-    redirect("/");
-  }
-
-  // Dados do utilizador para o Header
   const userData = {
-    nome: session.user.name || session.user.email?.split("@")[0] || "Administrador",
+    nome: "Administrador",
     isSocio: true,
     saldo: 5.50,
   };
@@ -64,10 +62,8 @@ export default async function DashboardPage() {
   return (
     <div className="min-h-screen bg-slate-100 text-slate-800 flex flex-col pb-20 md:pb-0">
       
-      {/* HEADER UNIFICADO */}
       <Header user={userData} />
 
-      {/* CONTEÚDO DA DASHBOARD */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8 space-y-8">
         
         {/* Título & Ações Rápidas */}
@@ -77,23 +73,29 @@ export default async function DashboardPage() {
               Painel de Controlo
             </h1>
             <p className="text-xs md:text-sm text-slate-500 mt-1">
-              Visão geral do sistema e gestão do bar para <strong className="text-slate-800">{session.user.email}</strong>
+              Visão geral do sistema e gestão do bar
             </p>
           </div>
 
           <div className="flex items-center gap-2">
-            <button className="bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md shadow-blue-200 transition flex items-center gap-2 cursor-pointer">
+            <button 
+              onClick={() => setRechargeModalOpen(true)}
+              className="bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md shadow-blue-200 transition flex items-center gap-2 cursor-pointer"
+            >
               <Plus className="w-4 h-4" />
               Carregar Saldo
             </button>
-            <button className="bg-white border border-slate-200 hover:bg-slate-50 active:scale-[0.98] text-slate-700 px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer">
+            <button 
+              onClick={() => setProductModalOpen(true)}
+              className="bg-white border border-slate-200 hover:bg-slate-50 active:scale-[0.98] text-slate-700 px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer"
+            >
               <Package className="w-4 h-4" />
               Gerir Stock
             </button>
           </div>
         </div>
 
-        {/* Grelha de Métricas (4 Cartões) */}
+        {/* Grelha de Métricas */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {STATS.map((stat, i) => {
             const Icon = stat.icon;
@@ -150,8 +152,18 @@ export default async function DashboardPage() {
 
       </main>
 
-      {/* FOOTER MOBILE */}
       <MobileFooter />
+
+      {/* Modais da Dashboard */}
+      <RechargeModal 
+        isOpen={rechargeModalOpen} 
+        onClose={() => setRechargeModalOpen(false)} 
+      />
+      
+      <ProductModal 
+        isOpen={productModalOpen} 
+        onClose={() => setProductModalOpen(false)} 
+      />
 
     </div>
   );

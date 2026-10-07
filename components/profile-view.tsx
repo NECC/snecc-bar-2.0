@@ -1,6 +1,7 @@
 "use client";
 
 import { UserCheck, CreditCard, LogOut, ShieldAlert } from "lucide-react";
+import { toast } from "sonner";
 
 interface ProfileViewProps {
   user: {
@@ -49,7 +50,7 @@ export default function ProfileView({ user }: ProfileViewProps) {
       {/* 3. Ações da Conta */}
       <div className="pt-2 border-t border-slate-100 space-y-2">
         <button 
-          onClick={() => alert("Logout efetuado")} 
+          onClick={() => toast.success("Logout efetuado")} 
           className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-xs text-rose-600 bg-rose-50 hover:bg-rose-100 transition"
         >
           <LogOut className="w-4 h-4 hover:bg-red-500" />

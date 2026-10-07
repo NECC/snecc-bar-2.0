@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { X, Search, CreditCard, ArrowRight, CheckCircle2 } from "lucide-react";
+import { rechargeUserBalanceAction } from "@/app/actions/dashboard";
+import { toast } from "sonner";
 
 interface RechargeModalProps {
   isOpen: boolean;
@@ -11,6 +13,7 @@ interface RechargeModalProps {
 export default function RechargeModal({ isOpen, onClose }: RechargeModalProps) {
   const [query, setQuery] = useState("");
   const [amount, setAmount] = useState("");
+  const [loading, setLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState<{ name: string; email: string; balance: number } | null>(null);
 
   if (!isOpen) return null;
@@ -28,17 +31,28 @@ export default function RechargeModal({ isOpen, onClose }: RechargeModalProps) {
     });
   };
 
-  const handleConfirmRecharge = (e: React.FormEvent) => {
+    const handleConfirmRecharge = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedUser || !amount) return;
 
-    alert(`Carregamento de ${parseFloat(amount).toFixed(2)}€ efetuado com sucesso para ${selectedUser.name}!`);
-    
-    // Reset do modal
-    setQuery("");
-    setAmount("");
-    setSelectedUser(null);
-    onClose();
+    setLoading(true);
+
+    const res = await rechargeUserBalanceAction({
+      email: selectedUser.email,
+      amount: parseFloat(amount),
+    });
+
+    setLoading(false);
+
+    if (res.success) {
+      toast.success(res.message);
+      setQuery("");
+      setAmount("");
+      setSelectedUser(null);
+      onClose();
+    } else {
+      toast.error(res.error || "Erro ao efetuar o carregamento.");
+    }
   };
 
   return (

@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { X, Package, Save } from "lucide-react";
+import { X, Package, Save, Loader2 } from "lucide-react";
+import { saveProductAction } from "@/app/actions/dashboard";
+import { toast } from "sonner";
 
 interface ProductModalProps {
   isOpen: boolean;
@@ -9,6 +11,7 @@ interface ProductModalProps {
 }
 
 export default function ProductModal({ isOpen, onClose }: ProductModalProps) {
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     nome: "",
     bay: "BAY-01",
@@ -20,17 +23,41 @@ export default function ProductModal({ isOpen, onClose }: ProductModalProps) {
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert(`Produto "${formData.nome}" guardado com sucesso!`);
-    onClose();
+    setLoading(true);
+
+    const res = await saveProductAction({
+      nome: formData.nome,
+      bay: formData.bay,
+      precoSocio: parseFloat(formData.precoSocio),
+      precoNaoSocio: parseFloat(formData.precoNaoSocio),
+      stock: parseInt(formData.stock, 10),
+      imagem: formData.imagem || undefined,
+    });
+
+    setLoading(false);
+
+    if (res.success) {
+      toast.success(res.message);
+      setFormData({
+        nome: "",
+        bay: "BAY-01",
+        precoSocio: "",
+        precoNaoSocio: "",
+        stock: "",
+        imagem: "",
+      });
+      onClose();
+    } else {
+      toast.error(res.error || "Erro ao guardar o produto.");
+    }
   };
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
       <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-100 overflow-hidden relative p-6">
         
-        {/* Header do Modal */}
         <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
           <div className="flex items-center gap-2.5">
             <div className="bg-blue-50 text-blue-600 p-2.5 rounded-2xl">
@@ -129,9 +156,10 @@ export default function ProductModal({ isOpen, onClose }: ProductModalProps) {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md shadow-blue-200 transition cursor-pointer mt-2"
+            disabled={loading}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md shadow-blue-200 transition cursor-pointer disabled:opacity-50 mt-2"
           >
-            <Save className="w-4 h-4" />
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             <span>Guardar Produto</span>
           </button>
         </form>

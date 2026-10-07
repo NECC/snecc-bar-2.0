@@ -9,6 +9,7 @@ import { LuUtensilsCrossed } from "react-icons/lu";
 import { IoReceiptOutline } from "react-icons/io5";
 import Header from "@/components/header";
 import MobileFooter from "@/components/mobile-footer";
+import { toast } from "sonner";
 
 const MOCK_COMPRAS = [
   {
@@ -46,7 +47,7 @@ export default function HomePage() {
     const preco = user.isSocio ? produto.precoSocio : produto.precoNaoSocio;
 
     if (user.saldo < preco) {
-      alert("Saldo insuficiente para efetuar esta compra!");
+      toast.error("Saldo insuficiente para efetuar esta compra!");
       return;
     }
 
@@ -56,7 +57,7 @@ export default function HomePage() {
       saldo: prev.saldo - preco,
     }));
 
-    alert(`Compra de "${produto.nome}" efetuada com sucesso!`);
+    toast.success(`Compra de "${produto.nome}" efetuada com sucesso!`);
   };
 
   return (

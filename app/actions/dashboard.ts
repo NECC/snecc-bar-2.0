@@ -57,7 +57,7 @@ export async function rechargeUserBalanceAction(formData: {
 
     return { 
       success: true, 
-      message: `Carregamento de ${amount.toFixed(2)}€ efetuado com sucesso para ${targetUser.name || targetUser.email}!` 
+      message: `Carregamento de ${amount.toFixed(2)}€ efetuado com sucesso para ${targetUser.email}!` 
     };
   } catch (error) {
     console.error("Erro ao carregar saldo:", error);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/header";
 import MobileFooter from "@/components/mobile-footer";
 import RechargeModal from "@/components/recharge-modal";
@@ -53,17 +53,35 @@ export default function DashboardPage() {
   const [rechargeModalOpen, setRechargeModalOpen] = useState(false);
   const [productModalOpen, setProductModalOpen] = useState(false);
 
-  const userData = {
-    nome: "Administrador",
-    isSocio: true,
-    saldo: 5.50,
+  const [userData, setUserData] = useState<{
+    isSocio: boolean;
+    isAdmin: boolean;
+    saldo: number;
+  }>({
+    isSocio: false,
+    isAdmin: false,
+    saldo: NaN,
+  });
+
+  const getUserData = async () => {
+    try {
+      const response = await fetch("/api/user");
+      if (!response.ok) {
+        throw new Error("Failed to fetch user data");
+      }
+      const data = await response.json();
+      setUserData(data.user);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
   };
+
+  useEffect(() => {
+    getUserData();
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-800 flex flex-col pb-20 md:pb-0">
-      
-      <Header user={userData} />
-
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8 space-y-8">
         
         {/* Título & Ações Rápidas */}
@@ -149,10 +167,7 @@ export default function DashboardPage() {
             ))}
           </div>
         </div>
-
       </main>
-
-      <MobileFooter />
 
       {/* Modais da Dashboard */}
       <RechargeModal 

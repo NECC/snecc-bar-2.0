@@ -1,22 +1,22 @@
 "use client";
 
-import { UtensilsCrossed, Receipt, CheckCircle2, LogOut, LayoutDashboard } from "lucide-react";
+import { UtensilsCrossed, Receipt, CheckCircle2, LogOut, LayoutDashboard, UserShield } from "lucide-react";
 import { LuUtensilsCrossed } from "react-icons/lu";
 import { IoReceiptOutline } from "react-icons/io5";
 import { signOutAction } from "@/app/actions/auth";
 
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
-import SignOut from "./signOut";
 
 const pathsToNames: Record<string, string> = {
-    "/products": "snacks",
-    "/orders": "pedidos",
-    "/dashboard": "dashboard"
-}
+  "/products": "snacks",
+  "/orders": "pedidos",
+  "/dashboard": "dashboard",
+  "/dashboard/products": "products",
+};
 
 interface User {
-    nome: string,
+    isAdmin: boolean,
     isSocio: boolean,
     saldo: number
 }
@@ -44,6 +44,7 @@ export default function Header(userInterface: UserInterface) {
                     </div>
                 </div>
     
+                {!user.isAdmin && 
                 <nav className="hidden md:flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
                 <button
                     onClick={() => router.push("/products")}
@@ -67,8 +68,10 @@ export default function Header(userInterface: UserInterface) {
                     <IoReceiptOutline className="w-4 h-4 "/>
                     Pedidos
                 </button>
-
-                {/* Novo Botão para a Dashboard */}
+                </nav>
+                }
+                { user.isAdmin &&
+                <nav className="hidden md:flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
                 <button
                     onClick={() => router.push("/dashboard")}
                     className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold transition ${
@@ -80,14 +83,25 @@ export default function Header(userInterface: UserInterface) {
                     <LayoutDashboard className="w-4 h-4" />
                     Dashboard
                 </button>
-                </nav>
+                <button
+                    onClick={() => router.push("/dashboard/products")}
+                    className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold transition ${
+                    abaAtiva === "products"
+                        ? "bg-white text-blue-600 shadow-sm"
+                        : "text-slate-600 hover:text-slate-900"
+                    }`}
+                >
+                    <LayoutDashboard className="w-4 h-4" />
+                    Produtos
+                </button>
+                </nav>}
             </div>
     
             {/* Canto Superior Direito */}
+            {!user.isAdmin &&
             <div className="flex items-center gap-3 md:gap-4">
                 <div className="flex items-center gap-2.5 bg-slate-50 border border-slate-200 px-3.5 py-1.5 rounded-2xl">
                 <span className="font-bold text-xs md:text-sm text-slate-800 flex items-center gap-1.5">
-                    {user.nome}
                     {user.isSocio && (
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 fill-emerald-100 flex-shrink-0" />
                     )}
@@ -106,7 +120,29 @@ export default function Header(userInterface: UserInterface) {
                         <LogOut className="w-5 h-5" />
                     </button>
                 </form>
-            </div>
+            </div>}
+
+            {user.isAdmin &&
+            <div className="flex items-center gap-3 md:gap-4">
+                <div className="flex items-center gap-2.5 bg-slate-50 border border-slate-200 px-3.5 py-1.5 rounded-2xl">
+                <span className="font-bold text-xs md:text-sm text-slate-800 flex items-center gap-1.5">
+                    <UserShield className="w-4 h-4 text-emerald-500 fill-emerald-100 flex-shrink-0" />
+                </span>
+    
+                <div className="h-4 w-px bg-slate-200" />
+    
+                <span className="text-xs font-semibold text-slate-500">
+                    Admin
+                </span>
+                </div>
+    
+                
+                <form action={signOutAction}>
+                    <button type="submit" className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition">
+                        <LogOut className="w-5 h-5" />
+                    </button>
+                </form>
+            </div>}
             </header>
       </div>
     )

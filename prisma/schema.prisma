@@ -10,7 +10,7 @@ datasource db {
  
 model User {
   id                  String                @id @default(cuid())
-  name                String?
+  balance             Decimal               @default(0) @db.Decimal(10, 2)
   email               String                @unique
   emailVerified       DateTime?
   image               String?
@@ -45,7 +45,7 @@ model VerificationToken {
 model Product {
   id                String    @id @default(cuid())
   name              String
-  image             String?
+  image             String?   @default("")
   stock             Stock[]
 }
 
@@ -53,9 +53,9 @@ model Stock {
   id                String    @id @default(cuid())
   product_id        String
   quantity          Int
-  acquisition_cost  Decimal
-  socio_price       Decimal
-  nsocio_price      Decimal
+  acquisition_cost  Decimal   @default(0) @db.Decimal(10, 2)
+  socio_price       Decimal   @default(0) @db.Decimal(10, 2)
+  nsocio_price      Decimal   @default(0) @db.Decimal(10, 2)
   times_sold        PurchaseTransaction[]
 
   product           Product   @relation(fields: [product_id], references: [id])
@@ -65,7 +65,7 @@ model BalanceTransaction {
   id          String          @id @default(cuid())
   user_id     String
   type        TransactionType
-  amount      Decimal
+  amount      Decimal         @default(0) @db.Decimal(10, 2)
   handler_id  String
   date        DateTime        @default(now())
 

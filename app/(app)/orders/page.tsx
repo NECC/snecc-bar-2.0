@@ -33,18 +33,16 @@ const MOCK_MOVIMENTOS_SALDO = [
   },
 ];
 
-export default function HomePage() {
+export default function OrdersPage() {
   const [user, setUser] = useState({
-    nome: "João Silva",
     isSocio: true,
+    isAdmin: false,
     saldo: 5.50,
   });
 
-  const [abaAtiva, setAbaAtiva] = useState<"snacks" | "pedidos">("snacks");
-
   // Handler para processar a compra individual
   const handleConfirmarCompra = (produto: Product) => {
-    const preco = user.isSocio ? produto.precoSocio : produto.precoNaoSocio;
+    const preco = user.isSocio ? produto.preco: produto.preco;
 
     if (user.saldo < preco) {
       toast.error("Saldo insuficiente para efetuar esta compra!");
@@ -63,8 +61,6 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-slate-100 text-slate-800 flex flex-col pb-20 md:pb-0">
 
-        {/* HEADER */}
-        <Header user={user}/>
         {/* CONTEÚDO PRINCIPAL */}
         <div className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8 flex gap-8">
             <OrdersView 
@@ -73,7 +69,6 @@ export default function HomePage() {
         </div>
 
         {/* BARRA INFERIOR TELEMÓVEL */}
-        <MobileFooter />
 
     </div>
   );

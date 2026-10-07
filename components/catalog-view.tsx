@@ -6,22 +6,17 @@ import { Check, X, ArrowRight } from "lucide-react";
 export interface Product {
   id: string;
   nome: string;
-  bay: string;
-  precoSocio: number;
-  precoNaoSocio: number;
-  stock: number;
+  preco: number;
   imagem: string;
 }
 
 interface CatalogViewProps {
   products: Product[];
-  isSocio: boolean;
   onConfirmarCompra: (produto: Product) => void;
 }
 
 export default function CatalogView({
   products,
-  isSocio,
   onConfirmarCompra,
 }: CatalogViewProps) {
   // Guarda apenas o produto que está a ser comprado no momento
@@ -51,25 +46,12 @@ export default function CatalogView({
       {/* Grelha de Produtos */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-5">
         {products.map((prod) => {
-          const precoExibido = isSocio ? prod.precoSocio : prod.precoNaoSocio;
-
           return (
             <div
               key={prod.id}
               onClick={() => setProdutoSelecionado(prod)}
               className="group relative bg-white rounded-2xl p-3.5 border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between select-none active:scale-95"
             >
-              <div className="flex justify-between items-center mb-2">
-                <span className="bg-slate-800 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-md">
-                  {prod.bay}
-                </span>
-                {prod.stock <= 3 && (
-                  <span className="bg-orange-100 text-orange-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">
-                    {prod.stock} rest.
-                  </span>
-                )}
-              </div>
-
               <div className="relative w-full h-32 md:h-36 bg-slate-50 rounded-xl overflow-hidden mb-3 flex items-center justify-center">
                 <img
                   src={prod.imagem}
@@ -84,13 +66,8 @@ export default function CatalogView({
                 </h3>
                 <div className="flex items-baseline justify-between mt-1.5">
                   <span className="text-sm md:text-base font-extrabold text-blue-600">
-                    {precoExibido.toFixed(2)}€
+                    {prod.preco}€
                   </span>
-                  {isSocio && (
-                    <span className="text-[11px] text-slate-400 line-through font-medium">
-                      {prod.precoNaoSocio.toFixed(2)}€
-                    </span>
-                  )}
                 </div>
               </div>
             </div>
@@ -114,9 +91,6 @@ export default function CatalogView({
 
             {/* Nome do Produto */}
             <div>
-              <span className="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-0.5 rounded-md mb-1 inline-block">
-                {produtoSelecionado.bay}
-              </span>
               <h3 className="text-lg font-extrabold text-slate-900 leading-tight">
                 {produtoSelecionado.nome}
               </h3>
@@ -124,7 +98,7 @@ export default function CatalogView({
 
             {/* Preço */}
             <div className="text-2xl font-black text-blue-600">
-              {(isSocio ? produtoSelecionado.precoSocio : produtoSelecionado.precoNaoSocio).toFixed(2)}€
+              {produtoSelecionado.preco.toFixed(2)}€
             </div>
 
             {/* Botões de Ação */}

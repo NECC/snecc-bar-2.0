@@ -3,6 +3,8 @@
 import { UtensilsCrossed, Receipt, CheckCircle2, LogOut, LayoutDashboard, UserShield } from "lucide-react";
 import { LuUtensilsCrossed } from "react-icons/lu";
 import { IoReceiptOutline } from "react-icons/io5";
+import { RiUserSearchLine } from "react-icons/ri";
+import { GoGraph } from "react-icons/go";
 import { signOutAction } from "@/app/actions/auth";
 
 import { usePathname } from "next/navigation";
@@ -13,6 +15,8 @@ const pathsToNames: Record<string, string> = {
   "/orders": "pedidos",
   "/dashboard": "dashboard",
   "/dashboard/products": "products",
+  "/dashboard/users" : "users",
+  "/dashboard/graficos" : "graficos"
 };
 
 interface User {
@@ -83,6 +87,7 @@ export default function Header(userInterface: UserInterface) {
                     <LayoutDashboard className="w-4 h-4" />
                     Dashboard
                 </button>
+                
                 <button
                     onClick={() => router.push("/dashboard/products")}
                     className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold transition ${
@@ -93,6 +98,30 @@ export default function Header(userInterface: UserInterface) {
                 >
                     <LayoutDashboard className="w-4 h-4" />
                     Produtos
+                </button>
+
+                <button
+                    onClick={() => router.push("/dashboard/users")}
+                    className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold transition ${
+                    abaAtiva === "users"
+                        ? "bg-white text-blue-600 shadow-sm"
+                        : "text-slate-600 hover:text-slate-900"
+                    }`}
+                >
+                    <RiUserSearchLine className="w-4 h-4" />
+                    Users
+                </button>
+
+                <button
+                    onClick={() => router.push("/dashboard/graficos")}
+                    className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold transition ${
+                    abaAtiva === "graficos"
+                        ? "bg-white text-blue-600 shadow-sm"
+                        : "text-slate-600 hover:text-slate-900"
+                    }`}
+                >
+                    <GoGraph className="w-4 h-4" />
+                    Gráficos
                 </button>
                 </nav>}
             </div>
@@ -106,11 +135,8 @@ export default function Header(userInterface: UserInterface) {
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 fill-emerald-100 flex-shrink-0" />
                     )}
                 </span>
-    
-                <div className="h-4 w-px bg-slate-200" />
-    
-                <span className="text-xs font-semibold text-slate-500">
-                    Saldo: <strong className="text-blue-600 font-extrabold">{user.saldo.toFixed(2)}€</strong>
+                <span className="text-md font-semibold text-slate-500">
+                    Saldo: <strong className="text-blue-600 font-extrabold">{user.saldo}€</strong>
                 </span>
                 </div>
     

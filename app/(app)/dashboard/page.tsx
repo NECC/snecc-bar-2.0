@@ -151,13 +151,6 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <button 
-              onClick={() => setRechargeModalOpen(true)}
-              className="bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md shadow-blue-200 transition flex items-center gap-2 cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-              Carregar Saldo
-            </button>
           </div>
         </div>
 

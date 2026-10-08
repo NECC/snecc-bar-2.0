@@ -135,11 +135,8 @@ export default function Header(userInterface: UserInterface) {
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 fill-emerald-100 flex-shrink-0" />
                     )}
                 </span>
-    
-                <div className="h-4 w-px bg-slate-200" />
-    
-                <span className="text-xs font-semibold text-slate-500">
-                    Saldo: <strong className="text-blue-600 font-extrabold">{user.saldo.toFixed(2)}€</strong>
+                <span className="text-md font-semibold text-slate-500">
+                    Saldo: <strong className="text-blue-600 font-extrabold">{user.saldo}€</strong>
                 </span>
                 </div>
     

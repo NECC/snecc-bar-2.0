@@ -30,19 +30,19 @@ export default function DashboardProductsPage() {
 
   const lostStock = async (id: string) => {
     try {
-      const response = await fetch(`/api/admin/products/stock`, {
-        method: "PUT",
+      const response = await fetch(`/api/admin/products/stock/losses`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ p_id: id }),
       });
       if (!response.ok) {
-        throw new Error("Failed to update product stock");
+        throw new Error("Failed to register loss");
       }
       getProductsData();
     } catch (error) {
-      console.error("Error updating product stock:", error);
+      console.error("Error registering loss:", error);
     }
   };
 

@@ -50,16 +50,16 @@ model Product {
 }
 
 model Stock {
-  id                String    @id @default(cuid())
+  id                String      @id @default(cuid())
   product_id        String
   quantity          Int
-  acquisition_cost  Decimal   @default(0) @db.Decimal(10, 2)
-  socio_price       Decimal   @default(0) @db.Decimal(10, 2)
-  nsocio_price      Decimal   @default(0) @db.Decimal(10, 2)
-  createdAt         DateTime  @default(now())
-  lost              Int       @default(0)
-  parcel_number     Int       @default(0)
+  acquisition_cost  Decimal     @default(0) @db.Decimal(10, 2)
+  socio_price       Decimal     @default(0) @db.Decimal(10, 2)
+  nsocio_price      Decimal     @default(0) @db.Decimal(10, 2)
+  createdAt         DateTime    @default(now())
+  parcel_number     Int         @default(0)
   times_sold        PurchaseTransaction[]
+  lost              LostStock[]
 
   product           Product   @relation(fields: [product_id], references: [id])
 }
@@ -84,6 +84,14 @@ model PurchaseTransaction {
 
   user          User        @relation("UserPurchases", fields: [user_id], references: [id])
   product_v     Stock       @relation(fields: [product_v_id], references: [id])
+}
+
+model LostStock {
+  id            String      @id @default(cuid())
+  stock_id      String
+  date          DateTime    @default(now())
+
+  stock         Stock       @relation(fields: [stock_id], references: [id])
 }
 
 enum Roles {

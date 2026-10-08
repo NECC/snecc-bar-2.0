@@ -13,35 +13,40 @@ import {
   ArrowDownLeft, 
   TrendingDown,
   DollarSign,
-  Package
+  Package,
+  Wallet
 } from "lucide-react";
 
-const STATS = [
-  { 
-    label: "Total Saldo Utilizadores", 
-    val: "428.50€", 
-    icon: CreditCard, 
-    change: "+12%",
+const STAT_CONFIG = [
+  {
+    key: "totalUserBalance",
+    label: "Total Saldo Utilizadores",
+    icon: CreditCard,
     color: "text-blue-600",
-    bgColor: "bg-blue-50" 
+    bgColor: "bg-blue-50",
   },
-  { 
-    label: "Lucro", 
-    val: "64.10€", 
-    icon: DollarSign, 
-    change: "+15%",
+  {
+    key: "profit",
+    label: "Lucro",
+    icon: DollarSign,
     color: "text-emerald-600",
-    bgColor: "bg-emerald-50" 
+    bgColor: "bg-emerald-50",
   },
-  { 
-    label: "Perdas", 
-    val: "3.20€", 
-    icon: TrendingDown, 
-    change: "-2%",
+  {
+    key: "losses",
+    label: "Perdas",
+    icon: TrendingDown,
     color: "text-rose-600",
-    bgColor: "bg-rose-50" 
+    bgColor: "bg-rose-50",
   },
-];
+  {
+    key: "netProfit",
+    label: "Lucro Líquido",
+    icon: Wallet,
+    color: "text-violet-600",
+    bgColor: "bg-violet-50",
+  },
+] as const;
 
 const RECENT_TRANSACTIONS = [
   { id: "1", user: "João Silva", type: "CARREGAMENTO", amount: "+10.00€", date: "Hoje, 14:20", admin: "Admin Maria" },
@@ -49,35 +54,86 @@ const RECENT_TRANSACTIONS = [
   { id: "3", user: "Pedro Santos", type: "RETIRADA", amount: "-2.50€", date: "Ontem, 18:00", admin: "Admin João" },
 ];
 
+type Metrics = {
+  totalUserBalance: {
+    current: string,
+    change: number,
+  };
+  profit: {
+    current: string,
+    change: number,
+  };
+  losses: {
+    current: string,
+    change: number,
+  };
+  netProfit: {
+    current: string,
+    change: number,
+  };
+};
+
+const euro = new Intl.NumberFormat("pt-PT", {
+    style: "currency",
+    currency: "EUR",
+  });
+
+const fmtChange = (v: number | null) => 
+  v === null ? "—" : `${v > 0 ? "+" : ""}${v}% esta semana`;
+
 export default function DashboardPage() {
   const [rechargeModalOpen, setRechargeModalOpen] = useState(false);
 
-  const [userData, setUserData] = useState<{
-    isSocio: boolean;
-    isAdmin: boolean;
-    saldo: number;
-  }>({
-    isSocio: false,
-    isAdmin: false,
-    saldo: NaN,
+  const [metricsData, setMetricsData] = useState<Metrics>({
+    totalUserBalance: {
+      current: "0.00",
+      change: 0.00,
+    },
+    profit: {
+      current: "0.00",
+      change: 0.00,
+    },
+    losses: {
+      current: "0.00",
+      change: 0.00,
+    },
+    netProfit: {
+      current: "0.00",
+      change: 0.00,
+    },
   });
 
-  const getUserData = async () => {
+  const getMetricsData = async () => {
     try {
-      const response = await fetch("/api/user");
+      const response = await fetch("/api/admin/metrics/this_week");
       if (!response.ok) {
-        throw new Error("Failed to fetch user data");
+        throw new Error("Failed to fetch metrics data");
       }
       const data = await response.json();
-      setUserData(data.user);
+      console.log(data.stats)
+      setMetricsData(data.stats);
+      // Update state with metrics data
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      console.error("Error fetching metrics data:", error);
     }
   };
 
   useEffect(() => {
-    getUserData();
+    getMetricsData();
   }, []);
+
+  const STATS = STAT_CONFIG.map((s) => {
+    const { current, change } = metricsData[s.key];
+    const value = Number(current);
+    const negative = s.key === "netProfit" && value < 0;
+    return {
+      ...s,
+      val: euro.format(value),
+      change: fmtChange(change),
+      color: negative ? "text-rose-600" : s.color,
+      bgColor: negative ? "bg-rose-50" : s.bgColor,
+    };
+  });
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-800 flex flex-col pb-20 md:pb-0">
@@ -115,7 +171,7 @@ export default function DashboardPage() {
                   <span className="text-xs font-semibold text-slate-500">{stat.label}</span>
                   <div className="text-xl md:text-2xl font-black text-slate-900 mt-1">{stat.val}</div>
                   <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full inline-block mt-2">
-                    {stat.change} este mês
+                    {stat.change}
                   </span>
                 </div>
                 <div className={`w-12 h-12 ${stat.bgColor} ${stat.color} rounded-2xl flex items-center justify-center flex-shrink-0`}>

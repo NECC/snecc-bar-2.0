@@ -58,7 +58,9 @@ export const GET = auth(async function GET(req) {
           quantity: true,
           createdAt: true,
           parcel_number: true,
-          lost: true,
+          _count: {
+            select: { lost: true },
+          },
         },
         orderBy: {
           createdAt: 'asc',
@@ -80,7 +82,7 @@ export const GET = auth(async function GET(req) {
         quantity: stock.quantity,
         acquisition_date: stock.createdAt.toLocaleDateString("pt-PT"),
         parcel_number: stock.parcel_number,
-        lost: stock.lost,
+        lost: stock._count.lost,
       })),
     };
   });

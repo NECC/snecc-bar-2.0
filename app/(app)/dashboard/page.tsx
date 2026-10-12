@@ -71,7 +71,7 @@ const euro = new Intl.NumberFormat("pt-PT", {
 });
 
 const fmtChange = (v: number | null) => 
-  v === null ? "—" : `${v > 0 ? "+" : ""}${v}% esta semana`;
+  v === null ? "—" : `${v > 0 ? "+" : ""}${v != 0 ? v + "%" : "Nenhuma mudança"} esta semana`;
 
 export default function DashboardPage() {
   const [rechargeModalOpen, setRechargeModalOpen] = useState(false);

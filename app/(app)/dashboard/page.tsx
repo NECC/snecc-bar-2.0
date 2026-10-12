@@ -5,47 +5,12 @@ import Header from "@/components/header";
 import MobileFooter from "@/components/mobile-footer";
 import RechargeModal from "@/components/recharge-modal";
 import { 
-  CreditCard, 
   Plus, 
   ArrowUpRight, 
   ArrowDownLeft, 
-  TrendingDown,
-  DollarSign,
-  Wallet,
   Search,
-  Filter
+  Receipt
 } from "lucide-react";
-
-const STAT_CONFIG = [
-  {
-    key: "totalUserBalance",
-    label: "Total Saldo Utilizadores",
-    icon: CreditCard,
-    color: "text-blue-600 dark:text-blue-600",
-    bgColor: "bg-blue-50 dark:bg-blue-50",
-  },
-  {
-    key: "profit",
-    label: "Lucro",
-    icon: DollarSign,
-    color: "text-emerald-600 dark:text-emerald-600",
-    bgColor: "bg-emerald-50 dark:bg-emerald-50",
-  },
-  {
-    key: "losses",
-    label: "Perdas",
-    icon: TrendingDown,
-    color: "text-rose-600 dark:text-rose-600",
-    bgColor: "bg-rose-50 dark:bg-rose-50",
-  },
-  {
-    key: "netProfit",
-    label: "Lucro Líquido",
-    icon: Wallet,
-    color: "text-violet-600 dark:text-violet-600",
-    bgColor: "bg-violet-50 dark:bg-violet-50",
-  },
-] as const;
 
 // Lista completa de transações do bar
 const ALL_TRANSACTIONS = [
@@ -58,51 +23,12 @@ const ALL_TRANSACTIONS = [
   { id: "7", user: "Inês Ribeiro", email: "ines.ribeiro@alunos.uminho.pt", item: "Água Mineral 50cl", type: "COMPRA", amount: "-0.60€", date: "08 Out, 08:20", admin: "Sistema" },
 ];
 
-type Metrics = {
-  totalUserBalance: { current: string; change: number };
-  profit: { current: string; change: number };
-  losses: { current: string; change: number };
-  netProfit: { current: string; change: number };
-};
-
-const euro = new Intl.NumberFormat("pt-PT", {
-  style: "currency",
-  currency: "EUR",
-});
-
-const fmtChange = (v: number | null) => 
-  v === null ? "—" : `${v > 0 ? "+" : ""}${v != 0 ? v + "%" : "Nenhuma mudança"} esta semana`;
-
-export default function DashboardPage() {
+export default function TransactionsPage() {
   const [rechargeModalOpen, setRechargeModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState<"TODAS" | "CARREGAMENTO" | "COMPRA" | "AJUSTE">("TODAS");
 
-  const [metricsData, setMetricsData] = useState<Metrics>({
-    totalUserBalance: { current: "0.00", change: 0.00 },
-    profit: { current: "0.00", change: 0.00 },
-    losses: { current: "0.00", change: 0.00 },
-    netProfit: { current: "0.00", change: 0.00 },
-  });
-
-  const getMetricsData = async () => {
-    try {
-      const response = await fetch("/api/admin/metrics/this_week");
-      if (!response.ok) {
-        throw new Error("Failed to fetch metrics data");
-      }
-      const data = await response.json();
-      setMetricsData(data.stats);
-    } catch (error) {
-      console.error("Error fetching metrics data:", error);
-    }
-  };
-
-  useEffect(() => {
-    getMetricsData();
-  }, []);
-
-  // Filtro dinâmico por texto e tipo
+  // Filtro dinâmico por texto (pesquisa por nome, email ou produto/depósito) e tipo
   const filteredTransactions = ALL_TRANSACTIONS.filter((tx) => {
     const q = searchQuery.toLowerCase();
     const matchesQuery = 
@@ -115,74 +41,35 @@ export default function DashboardPage() {
     return matchesQuery && matchesType;
   });
 
-  const STATS = STAT_CONFIG.map((s) => {
-    const { current, change } = metricsData[s.key];
-    const value = Number(current);
-    const negative = s.key === "netProfit" && value < 0;
-    return {
-      ...s,
-      val: euro.format(value),
-      change: fmtChange(change),
-      color: negative ? "text-rose-600 dark:text-rose-600" : s.color,
-      bgColor: negative ? "bg-rose-50 dark:bg-rose-50" : s.bgColor,
-    };
-  });
-
   return (
     <div className="min-h-screen bg-white dark:bg-white text-slate-800 dark:text-slate-800 flex flex-col pb-20 md:pb-0 transition-colors duration-300">
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8 space-y-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8 space-y-6">
         
         {/* Título & Ações Rápidas */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-slate-900 tracking-tight">
-              Painel de Controlo
+            <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-slate-900 tracking-tight flex items-center gap-2.5">
+              <Receipt className="w-7 h-7 text-blue-600" />
+              Transações Realizadas
             </h1>
             <p className="text-xs md:text-sm text-slate-500 dark:text-slate-500 mt-1">
-              Visão geral do sistema e gestão do bar
+              Consulta e pesquisa o histórico completo de compras, depósitos e ajustes do bar
             </p>
           </div>
-
-          <div className="flex items-center gap-2">
-            <button 
-              onClick={() => setRechargeModalOpen(true)}
-              className="bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md shadow-blue-200 dark:shadow-none transition flex items-center gap-2 cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-              Carregar Saldo
-            </button>
-          </div>
         </div>
 
-        {/* Grelha de Métricas */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {STATS.map((stat, i) => {
-            const Icon = stat.icon;
-            return (
-              <div key={i} className="bg-white dark:bg-white p-5 rounded-2xl border border-slate-200 dark:border-slate-200 shadow-sm flex items-center justify-between">
-                <div>
-                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-500">{stat.label}</span>
-                  <div className="text-xl md:text-2xl font-black text-slate-900 dark:text-slate-900 mt-1">{stat.val}</div>
-                  <span className="text-[10px] font-bold text-slate-600 dark:text-slate-600 bg-slate-100 dark:bg-slate-100 px-2 py-0.5 rounded-full inline-block mt-2 border border-slate-200 dark:border-slate-200">
-                    {stat.change}
-                  </span>
-                </div>
-                <div className={`w-12 h-12 ${stat.bgColor} ${stat.color} rounded-2xl flex items-center justify-center flex-shrink-0`}>
-                  <Icon className="w-6 h-6" />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Histórico Completo de Transações */}
+        {/* Painel do Histórico Completo de Transações */}
         <div className="bg-white dark:bg-white rounded-3xl p-6 border border-slate-200 dark:border-slate-200 shadow-sm space-y-5">
           
           {/* Header da Tabela com Pesquisa & Filtro */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-100 pb-4">
             <div>
-              <h2 className="text-base font-extrabold text-slate-900 dark:text-slate-900">Todas as Transações</h2>
-              <p className="text-xs text-slate-500 dark:text-slate-500">Histórico de compras, depósitos de saldo e ajustes</p>
+              <h2 className="text-base font-extrabold text-slate-900 dark:text-slate-900">
+                Histórico ({filteredTransactions.length})
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-500">
+                Registo detalhado das movimentações de saldo no sistema
+              </p>
             </div>
 
             {/* Controlo de Filtros */}
@@ -196,7 +83,7 @@ export default function DashboardPage() {
                   placeholder="Pesquisar email ou produto..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-white dark:bg-white border border-slate-200 dark:border-slate-200 rounded-2xl pl-10 pr-4 py-2 text-xs text-slate-800 dark:text-slate-800 focus:outline-none focus:border-blue-600 transition"
+                  className="w-full bg-slate-50 dark:bg-slate-50 border border-slate-200 dark:border-slate-200 rounded-2xl pl-10 pr-4 py-2 text-xs text-slate-800 dark:text-slate-800 focus:outline-none focus:border-blue-600 transition"
                 />
               </div>
 

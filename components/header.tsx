@@ -6,9 +6,10 @@ import { IoReceiptOutline } from "react-icons/io5";
 import { RiUserSearchLine } from "react-icons/ri";
 import { GoGraph } from "react-icons/go";
 import { signOutAction } from "@/app/actions/auth";
-
+import { MdOutlineFastfood } from "react-icons/md";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
+import { FaRegClock } from "react-icons/fa";
 
 const pathsToNames: Record<string, string> = {
   "/products": "snacks",
@@ -84,8 +85,8 @@ export default function Header(userInterface: UserInterface) {
                         : "text-slate-600 hover:text-slate-900"
                     }`}
                 >
-                    <LayoutDashboard className="w-4 h-4" />
-                    Dashboard
+                    <FaRegClock className="w-4 h-4" />
+                    Transações
                 </button>
                 
                 <button
@@ -96,7 +97,7 @@ export default function Header(userInterface: UserInterface) {
                         : "text-slate-600 hover:text-slate-900"
                     }`}
                 >
-                    <LayoutDashboard className="w-4 h-4" />
+                    <MdOutlineFastfood className="w-4 h-4" />
                     Produtos
                 </button>
 

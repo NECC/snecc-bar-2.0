@@ -8,9 +8,6 @@ export default async function HomePage() {
   const session = await auth();
 
   if (session?.user) {
-    if (session.user.email === "afonso.martins8282@gmail.com") {
-      redirect("/dashboard");
-    }
     redirect("/products");
   }
 

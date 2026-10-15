@@ -77,6 +77,5 @@ export const GET = auth(async function GET(req) {
     ORDER BY w.week_start
   `;
 
-  console.log(weeks)
   return NextResponse.json({ weeks }, { status: 200 });
 });

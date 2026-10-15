@@ -14,7 +14,7 @@ import { FaRegClock } from "react-icons/fa";
 const pathsToNames: Record<string, string> = {
   "/products": "snacks",
   "/orders": "pedidos",
-  "/dashboard": "dashboard",
+  "/dashboard/transactions": "transactions",
   "/dashboard/products": "products",
   "/dashboard/users" : "users",
   "/dashboard/graficos" : "graficos"
@@ -78,9 +78,9 @@ export default function Header(userInterface: UserInterface) {
                 { user.isAdmin &&
                 <nav className="hidden md:flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
                 <button
-                    onClick={() => router.push("/dashboard")}
+                    onClick={() => router.push("/dashboard/transactions")}
                     className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold transition ${
-                    abaAtiva === "dashboard"
+                    abaAtiva === "transactions"
                         ? "bg-white text-blue-600 shadow-sm"
                         : "text-slate-600 hover:text-slate-900"
                     }`}

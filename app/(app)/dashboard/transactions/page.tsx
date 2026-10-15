@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Header from "@/components/header";
-import MobileFooter from "@/components/mobile-footer";
 import RechargeModal from "@/components/recharge-modal";
 import { 
   Plus, 
@@ -12,29 +10,73 @@ import {
   Receipt
 } from "lucide-react";
 
-// Lista completa de transações do bar
-const ALL_TRANSACTIONS = [
-  { id: "1", user: "João Silva", email: "joao.silva@alunos.uminho.pt", item: "Depósito de Saldo", type: "CARREGAMENTO", amount: "+10.00€", date: "Hoje, 14:20", admin: "Admin Maria" },
-  { id: "2", user: "Ana Costa", email: "ana.costa@alunos.uminho.pt", item: "Guaraná Antarctica", type: "COMPRA", amount: "-0.80€", date: "Hoje, 12:15", admin: "Sistema" },
-  { id: "3", user: "Pedro Santos", email: "pedro.santos@gmail.com", item: "Ajuste", type: "AJUSTE", amount: "-2.50€", date: "Ontem, 18:00", admin: "Admin João" },
-  { id: "4", user: "Afonso Martins", email: "afonso.martins8282@gmail.com", item: "Gomas Fini", type: "COMPRA", amount: "-0.75€", date: "Ontem, 16:10", admin: "Sistema" },
-  { id: "5", user: "Mariana Lopes", email: "mariana.lopes@alunos.uminho.pt", item: "Depósito MBWay", type: "CARREGAMENTO", amount: "+20.00€", date: "09 Out, 11:30", admin: "Admin Maria" },
-  { id: "6", user: "Carlos Eduardo", email: "carlos.eduardo@gmail.com", item: "Café Espresso", type: "COMPRA", amount: "-0.50€", date: "08 Out, 09:45", admin: "Sistema" },
-  { id: "7", user: "Inês Ribeiro", email: "ines.ribeiro@alunos.uminho.pt", item: "Água Mineral 50cl", type: "COMPRA", amount: "-0.60€", date: "08 Out, 08:20", admin: "Sistema" },
-];
+type Transaction = {
+  id: string,
+  email: string,
+  item: string | null,
+  type: string,
+  amount: string,
+  date: string,
+  admin: string | null,
+}
+
+const euro = new Intl.NumberFormat("pt-PT", {
+  style: "currency",
+  currency: "EUR",
+});
 
 export default function TransactionsPage() {
-  const [rechargeModalOpen, setRechargeModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedType, setSelectedType] = useState<"TODAS" | "CARREGAMENTO" | "COMPRA" | "AJUSTE">("TODAS");
+  const [selectedType, setSelectedType] = useState<"TODAS" | "Carregamento" | "Compra" | "Ajuste">("TODAS");
+
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  
+  const getTransactionsData = async () => {
+    try {
+      setTransactions([]);
+      const response = await fetch("/api/admin/transactions", { method: "GET" });
+      if (!response.ok) {
+        throw new Error("Failed to fetch transactions data");
+      }
+      const data = await response.json();
+      const fromBalance = (data.b_transactions ?? []).map((tx: any) => ({
+        id: `b-${tx.id}`,
+        email: tx.user,
+        item: null,
+        type: tx.type == "RETIRAR" ? "Ajuste" : "Carregamento",
+        amount: euro.format(tx.amount),
+        admin: tx.handler,
+        date: tx.date.toLocaleString("pt-PT", { timeZone: "UTC" }),
+      }));
+
+      const fromPurchase = (data.p_transactions ?? []).map((tx: any) => ({
+        id: `p-${tx.id}`,
+        email: tx.user,
+        item: tx.item,
+        type: "Compra",
+        amount: euro.format(tx.amount),
+        admin: null,
+        date: tx.date.toLocaleString("en-GB", { timeZone: "UTC" }),
+      }));
+
+      setTransactions([...fromBalance, ...fromPurchase]);
+    } catch (error) {
+      console.error("Error fetching transactions data:", error);
+    }
+  };
+
+  useEffect(() => {
+    getTransactionsData();
+  }, []);
+  
 
   // Filtro dinâmico por texto (pesquisa por nome, email ou produto/depósito) e tipo
-  const filteredTransactions = ALL_TRANSACTIONS.filter((tx) => {
+  const filteredTransactions = transactions.filter((tx) => {
     const q = searchQuery.toLowerCase();
     const matchesQuery = 
-      tx.user.toLowerCase().includes(q) ||
       tx.email.toLowerCase().includes(q) ||
-      tx.item.toLowerCase().includes(q);
+      (tx.admin && tx.admin.toLowerCase().includes(q)) ||
+      (tx.item && tx.item.toLowerCase().includes(q));
 
     const matchesType = selectedType === "TODAS" || tx.type === selectedType;
 
@@ -89,7 +131,7 @@ export default function TransactionsPage() {
 
               {/* Seletor do Tipo de Transação */}
               <div className="flex items-center gap-1 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
-                {(["TODAS", "CARREGAMENTO", "COMPRA", "AJUSTE"] as const).map((type) => (
+                {(["TODAS", "Carregamento", "Compra", "Ajuste"] as const).map((type) => (
                   <button
                     key={type}
                     onClick={() => setSelectedType(type)}
@@ -99,7 +141,7 @@ export default function TransactionsPage() {
                         : "bg-white dark:bg-white text-slate-600 dark:text-slate-600 border-slate-200 dark:border-slate-200 hover:bg-slate-50 dark:hover:bg-slate-50"
                     }`}
                   >
-                    {type === "TODAS" ? "Todas" : type === "CARREGAMENTO" ? "Depósitos" : type === "COMPRA" ? "Compras" : "Ajustes"}
+                    {type === "TODAS" ? "Todas" : type === "Carregamento" ? "Depósitos" : type === "Compra" ? "Compras" : "Ajustes"}
                   </button>
                 ))}
               </div>
@@ -120,25 +162,23 @@ export default function TransactionsPage() {
                   {/* Ícone, Nome/Email e Detalhes */}
                   <div className="flex items-center gap-3">
                     <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold flex-shrink-0 ${
-                      tx.type === "CARREGAMENTO" 
+                      tx.type === "Carregamento" 
                         ? "bg-emerald-100 dark:bg-emerald-100 text-emerald-700 dark:text-emerald-700" 
                         : tx.type === "AJUSTE"
                         ? "bg-rose-100 dark:bg-rose-100 text-rose-700 dark:text-rose-700"
                         : "bg-blue-100 dark:bg-blue-100 text-blue-700 dark:text-blue-700"
                     }`}>
-                      {tx.type === "CARREGAMENTO" ? <ArrowDownLeft className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
+                      {tx.type === "Carregamento" ? <ArrowDownLeft className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
                     </div>
 
                     <div>
                       <div className="font-bold text-slate-800 dark:text-slate-800 text-sm">
-                        {tx.user} <span className="font-normal text-xs text-slate-500 dark:text-slate-500">({tx.item})</span>
+                        {tx.email} <span className={`font-normal text-xs text-slate-500 dark:text-slate-500 ${!tx.item ? "hidden" : ""}`}>({tx.item})</span>
                       </div>
                       <div className="text-[11px] text-slate-500 dark:text-slate-500 flex items-center gap-2 mt-0.5">
-                        <span>{tx.email}</span>
-                        <span>•</span>
+                        <span className={`${!tx.item ? "hidden" : ""}`}>{tx.item} •</span>
                         <span>{tx.date}</span>
-                        <span>•</span>
-                        <span>Resp: {tx.admin}</span>
+                        <span className={`${!tx.admin ? "hidden" : ""}`}>• Responsável: {tx.admin}</span>
                       </div>
                     </div>
                   </div>
@@ -155,12 +195,6 @@ export default function TransactionsPage() {
 
         </div>
       </main>
-
-      {/* Modais da Dashboard */}
-      <RechargeModal 
-        isOpen={rechargeModalOpen} 
-        onClose={() => setRechargeModalOpen(false)} 
-      />
     </div>
   );
 }

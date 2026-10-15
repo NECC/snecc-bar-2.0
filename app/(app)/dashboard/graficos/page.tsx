@@ -298,12 +298,6 @@ export default function AnalyticsPage() {
 
       </main>
 
-      {/* Modal de Carregamento */}
-      <RechargeModal 
-        isOpen={rechargeModalOpen} 
-        onClose={() => setRechargeModalOpen(false)} 
-      />
-
     </div>
   );
 }

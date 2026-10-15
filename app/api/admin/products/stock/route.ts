@@ -17,6 +17,14 @@ export const POST = auth(async function POST(req) {
   }
 
   try {
+    const product = await prisma.product.findUnique( {
+      where: {
+        id: p_id,
+      }
+    })
+
+    if (!product) throw new Error("Product not found");
+
     const count = await prisma.stock.count({
         where: { product: { id: p_id } },
     });

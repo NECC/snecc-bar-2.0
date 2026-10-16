@@ -8,13 +8,12 @@ async function getWeekMetrics(start: Date, end: Date) {
     prisma.$queryRaw<{ profit: string }[]>`
       SELECT COALESCE(SUM(p.price - p.acquisition_cost), 0)::text AS profit
       FROM (
-        SELECT CASE u."type"
+        SELECT CASE pt.user_type
                  WHEN 'SOCIO'   THEN s.socio_price
                  WHEN 'N_SOCIO' THEN s.nsocio_price
                END AS price,
                s.acquisition_cost
         FROM "PurchaseTransaction" pt
-        JOIN "User"  u ON u.id = pt.user_id
         JOIN "Stock" s ON s.id = pt.product_v_id
         WHERE pt.date >= ${start} AND pt.date < ${end}
       ) p
@@ -25,20 +24,19 @@ async function getWeekMetrics(start: Date, end: Date) {
     prisma.$queryRaw<{ balance: string }[]>`
       SELECT (
         (SELECT COALESCE(SUM(
-                  CASE bt.type
-                    WHEN 'CARREGAR' THEN bt.amount
-                    WHEN 'RETIRAR'  THEN -bt.amount
-                  END), 0)
+           CASE bt.type
+             WHEN 'CARREGAR' THEN bt.amount
+             WHEN 'RETIRAR'  THEN -bt.amount
+           END), 0)
          FROM "BalanceTransaction" bt
          WHERE bt.date < ${end})
         -
         (SELECT COALESCE(SUM(
-                  CASE u."type"
-                    WHEN 'SOCIO'   THEN s.socio_price
-                    WHEN 'N_SOCIO' THEN s.nsocio_price
-                  END), 0)
+           CASE pt.user_type
+             WHEN 'SOCIO'   THEN s.socio_price
+             WHEN 'N_SOCIO' THEN s.nsocio_price
+           END), 0)
          FROM "PurchaseTransaction" pt
-         JOIN "User"  u ON u.id = pt.user_id
          JOIN "Stock" s ON s.id = pt.product_v_id
          WHERE pt.date < ${end})
       )::text AS balance
@@ -67,7 +65,7 @@ async function getWeekMetrics(start: Date, end: Date) {
 const pctChange = (cur: string, prev: string): number | null => {
   const p = new Prisma.Decimal(prev);
   const c = new Prisma.Decimal(cur);
-  if (p.isZero()) return c > new Prisma.Decimal(0.0) ? 100 : c.isZero() ? 0 : -100;
+  if (p.isZero()) return c.gt(0) ? 100 : c.isZero() ? 0 : -100;
   return c
     .sub(p)
     .div(p.abs())

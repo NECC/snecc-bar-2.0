@@ -6,3 +6,4 @@ node_modules/
 generated/prisma/
 tsconfig.tsbuildinfo
 generated/prisma/
+certificates

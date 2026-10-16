@@ -3,20 +3,23 @@
 import { useState } from "react";
 import { Tag, CreditCard, Calendar, Clock, ArrowDownLeft, ArrowUpRight } from "lucide-react";
 
-export interface CompraItem {
+export interface Compra {
   id: string;
-  produtoNome: string;
-  produtoImagem: string;
-  bay: string;
-  precoPago: number;
-  data: string;
-  estatutoNaAltura: string;
+  name: string;
+  image: string;
+  price: number;
+  date: string;
+  type: string;
 }
-
 
 interface OrdersViewProps {
-  compras: CompraItem[];
+  compras: Compra[];
 }
+
+const euro = new Intl.NumberFormat("pt-PT", {
+  style: "currency",
+  currency: "EUR",
+});
 
 export default function OrdersView({ compras }: OrdersViewProps) {
   const [subAba, setSubAba] = useState<"compras" | "saldo">("compras");
@@ -54,7 +57,7 @@ export default function OrdersView({ compras }: OrdersViewProps) {
       {subAba === "compras" && (
         <div className="space-y-3">
           {compras.map((item) => {
-            const { data, hora } = formatarData(item.data);
+            const { data, hora } = formatarData(item.date);
             return (
               <div
                 key={item.id}
@@ -62,18 +65,15 @@ export default function OrdersView({ compras }: OrdersViewProps) {
               >
                 <div className="flex items-center gap-3.5 min-w-0">
                   <img
-                    src={item.produtoImagem}
-                    alt={item.produtoNome}
+                    src={item.image}
+                    alt={item.name}
                     className="w-12 h-12 rounded-xl object-cover bg-slate-50 border border-slate-100 flex-shrink-0"
                   />
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <h4 className="font-bold text-slate-900 text-sm md:text-base truncate">
-                        {item.produtoNome}
+                        {item.name}
                       </h4>
-                      <span className="bg-slate-100 text-slate-700 text-[10px] font-bold px-2 py-0.5 rounded-md flex-shrink-0">
-                        {item.bay}
-                      </span>
                     </div>
 
                     <div className="flex items-center gap-3 text-slate-400 text-xs mt-1">
@@ -91,10 +91,10 @@ export default function OrdersView({ compras }: OrdersViewProps) {
 
                 <div className="text-right flex-shrink-0">
                   <div className="text-sm md:text-base font-extrabold text-slate-900">
-                    -{item.precoPago.toFixed(2)}€
+                    -{euro.format(item.price)}
                   </div>
                   <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full inline-block mt-0.5">
-                    {item.estatutoNaAltura}
+                    {item.type}
                   </span>
                 </div>
               </div>

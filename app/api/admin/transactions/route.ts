@@ -62,9 +62,10 @@ export const GET = auth(async function GET(req) {
     return {
       id: transaction.id,
       user: transaction.user.email,
-      price: transaction.user.type == "SOCIO" ? transaction.product_v.socio_price : transaction.product_v.nsocio_price,
+      price: transaction.user_type === "SOCIO" ? transaction.product_v.socio_price : transaction.product_v.nsocio_price,
       item: transaction.product_v.product.name,
-      date: transaction.date.toLocaleString("pt-PT"),
+      date: transaction.date.toLocaleString("pt-PT", {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'}),
+      user_type: transaction.user_type,
     };
   });
 

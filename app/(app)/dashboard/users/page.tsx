@@ -8,9 +8,11 @@ import {
   UserCheck, 
   UserX, 
   Shield, 
-  Plus, 
+  Plus,
+  Minus,
   Mail
 } from "lucide-react";
+import RemoveModal from "@/components/remove-modal";
 
 const euro = new Intl.NumberFormat("pt-PT", {
   style: "currency",
@@ -22,6 +24,7 @@ export default function UsersManagementPage() {
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState<"ALL" | "SOCIO" | "N_SOCIO" | "ADMIN">("ALL");
   const [rechargeModalOpen, setRechargeModalOpen] = useState(false);
+  const [removeModalOpen, setRemoveModalOpen] = useState(false);
 
   const getUserData = async () => {
     try {
@@ -66,13 +69,22 @@ export default function UsersManagementPage() {
             </p>
           </div>
 
-          <button 
-            onClick={() => setRechargeModalOpen(true)}
-            className="bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md shadow-blue-200 transition flex items-center gap-2 cursor-pointer"
-          >
-            <Plus className="w-4 h-4" />
-            Carregar Saldo
-          </button>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setRechargeModalOpen(true)}
+              className="bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md shadow-blue-200 transition flex items-center gap-2 cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              Carregar Saldo
+            </button>
+            <button 
+              onClick={() => setRemoveModalOpen(true)}
+              className="bg-red-600 hover:bg-red-700 active:scale-[0.98] text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md shadow-red-200 transition flex items-center gap-2 cursor-pointer"
+            >
+              <Minus className="w-4 h-4" />
+              Retirar Saldo
+            </button>
+          </div>
         </div>
 
         {/* Barra de Pesquisa e Filtros */}
@@ -183,6 +195,13 @@ export default function UsersManagementPage() {
       <RechargeModal 
         isOpen={rechargeModalOpen} 
         onClose={() => setRechargeModalOpen(false)}
+        users={users}
+        onSuccess={getUserData}
+      />
+
+      <RemoveModal
+        isOpen={removeModalOpen} 
+        onClose={() => setRemoveModalOpen(false)}
         users={users}
         onSuccess={getUserData}
       />

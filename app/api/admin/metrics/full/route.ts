@@ -37,16 +37,15 @@ export const GET = auth(async function GET(req) {
     ),
     purchases AS (
       SELECT date_trunc('week', pt.date + interval '1 day') - interval '1 day' AS week_start,
-             SUM(p.price)                      AS revenue,
-             SUM(p.price - s.acquisition_cost) AS profit
+          SUM(p.price)                      AS revenue,
+          SUM(p.price - s.acquisition_cost) AS profit
       FROM "PurchaseTransaction" pt
-      JOIN "User"  u ON u.id = pt.user_id
       JOIN "Stock" s ON s.id = pt.product_v_id
       CROSS JOIN LATERAL (
-        SELECT CASE u."type"
-                 WHEN 'SOCIO'   THEN s.socio_price
-                 WHEN 'N_SOCIO' THEN s.nsocio_price
-               END AS price
+        SELECT CASE pt.user_type
+                WHEN 'SOCIO'   THEN s.socio_price
+                WHEN 'N_SOCIO' THEN s.nsocio_price
+              END AS price
       ) p
       WHERE p.price IS NOT NULL
       GROUP BY 1

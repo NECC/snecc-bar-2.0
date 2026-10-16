@@ -18,6 +18,7 @@ type Transaction = {
   amount: string,
   date: string,
   admin: string | null,
+  socio: boolean | null,
 }
 
 const euro = new Intl.NumberFormat("pt-PT", {
@@ -47,6 +48,7 @@ export default function TransactionsPage() {
         amount: euro.format(tx.amount),
         admin: tx.handler,
         date: tx.date.toLocaleString("pt-PT", { timeZone: "UTC" }),
+        socio: null,
       }));
 
       const fromPurchase = (data.p_transactions ?? []).map((tx: any) => ({
@@ -54,9 +56,10 @@ export default function TransactionsPage() {
         email: tx.user,
         item: tx.item,
         type: "Compra",
-        amount: euro.format(tx.amount),
+        amount: euro.format(-tx.price),
         admin: null,
-        date: tx.date.toLocaleString("en-GB", { timeZone: "UTC" }),
+        date: tx.date.toLocaleString("pt-PT", { timeZone: "UTC" }),
+        socio: tx.user_type === "SOCIO",
       }));
 
       setTransactions([...fromBalance, ...fromPurchase]);
@@ -173,12 +176,20 @@ export default function TransactionsPage() {
 
                     <div>
                       <div className="font-bold text-slate-800 dark:text-slate-800 text-sm">
-                        {tx.email} <span className={`font-normal text-xs text-slate-500 dark:text-slate-500 ${!tx.item ? "hidden" : ""}`}>({tx.item})</span>
+                        {tx.email}
                       </div>
                       <div className="text-[11px] text-slate-500 dark:text-slate-500 flex items-center gap-2 mt-0.5">
-                        <span className={`${!tx.item ? "hidden" : ""}`}>{tx.item} •</span>
                         <span>{tx.date}</span>
-                        <span className={`${!tx.admin ? "hidden" : ""}`}>• Responsável: {tx.admin}</span>
+                        <div className={`${!tx.item ? "hidden" : ""} flex items-center gap-2`}>
+                          <span> • </span>
+                          <span>{tx.socio ? "SOCIO" : "N_SOCIO"}</span>
+                          <span> • </span>
+                          <span> {tx.item} </span>
+                        </div>
+                        <div className={`${!tx.admin ? "hidden" : ""} flex items-center gap-2`}>
+                          <span> • </span>
+                          <span> Responsável: {tx.admin}</span>
+                        </div>
                       </div>
                     </div>
                   </div>

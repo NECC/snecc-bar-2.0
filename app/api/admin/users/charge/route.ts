@@ -25,7 +25,7 @@ export const POST = auth(async function POST(req) {
         where: { id: u_id },
     });
 
-    if (!user) if (!user) throw new Error("User not found");
+    if (!user) throw new Error("User not found");
 
     const result = await prisma.$transaction([
         prisma.user.update({

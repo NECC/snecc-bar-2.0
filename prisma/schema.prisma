@@ -80,6 +80,7 @@ model PurchaseTransaction {
   id            String      @id @default(cuid())
   user_id       String
   product_v_id  String
+  user_type      Roles       @default(N_SOCIO)
   date          DateTime    @default(now())
 
   user          User        @relation("UserPurchases", fields: [user_id], references: [id])

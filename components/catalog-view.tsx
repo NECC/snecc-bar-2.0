@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { Check, X, ArrowRight } from "lucide-react";
 
 export interface Product {
@@ -12,22 +12,23 @@ export interface Product {
 
 interface CatalogViewProps {
   products: Product[];
-  onConfirmarCompra: (produto: Product) => void;
+  onConfirmarCompra: (id: string) => void;
+  produtoSelecionado: Product | null;
+  setProdutoSelecionado: Dispatch<SetStateAction<Product | null>>;
 }
 
 export default function CatalogView({
   products,
   onConfirmarCompra,
+  produtoSelecionado,
+  setProdutoSelecionado
 }: CatalogViewProps) {
-  // Guarda apenas o produto que está a ser comprado no momento
-  const [produtoSelecionado, setProdutoSelecionado] = useState<Product | null>(null);
 
   const fecharModal = () => setProdutoSelecionado(null);
 
   const handleConfirmar = () => {
     if (produtoSelecionado) {
-      onConfirmarCompra(produtoSelecionado);
-      fecharModal();
+      onConfirmarCompra(produtoSelecionado.id);
     }
   };
 
@@ -98,7 +99,7 @@ export default function CatalogView({
 
             {/* Preço */}
             <div className="text-2xl font-black text-blue-600">
-              {produtoSelecionado.preco.toFixed(2)}€
+              {produtoSelecionado.preco}€
             </div>
 
             {/* Botões de Ação */}

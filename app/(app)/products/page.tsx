@@ -4,15 +4,13 @@ import { useEffect, useState } from "react";
 
 import CatalogView, { Product } from "@/components/catalog-view";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function ProductsPage() {
-  const [user, setUser] = useState({
-    isSocio: true,
-    isAdmin: false,
-    saldo: 5.50
-  });
+  const router = useRouter();
 
   const [products, setProducts] = useState<Product[]>([]);
+  const [produtoSelecionado, setProdutoSelecionado] = useState<Product | null>(null);
 
   const fetchProducts = async () => {
     try {
@@ -21,7 +19,6 @@ export default function ProductsPage() {
         throw new Error("Failed to fetch products");
       }
       const data = await response.json();
-      console.log("Fetched Products:", data.products);
       setProducts(data.products);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -34,21 +31,30 @@ export default function ProductsPage() {
   }, []);
 
   // Handler para processar a compra individual
-  const handleConfirmarCompra = (produto: Product) => {
-    const preco = user.isSocio ? produto.preco : produto.preco;
-    
-    if (user.saldo < preco) {
-      toast.error("Saldo insuficiente para efetuar esta compra!");
-      return;
+  const handleConfirmarCompra = async (id: string) => {
+    try {
+      const response = await fetch("/api/user/purchase", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({p_id: id}),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error("Failed to purchase product");
+      }
+
+      toast.success(data.message);
+      router.refresh();
+      fetchProducts();
+    } catch (error) {
+      console.error("Error buying product:", error);
+      toast.error("Compra do produto falhou");
+    } finally {
+      setProdutoSelecionado(null);
     }
-
-    // Deduz o valor do saldo do utilizador
-    setUser((prev) => ({
-      ...prev,
-      saldo: prev.saldo - preco,
-    }));
-
-    toast.success(`Compra de "${produto.nome}" efetuada com sucesso!`);
   };
 
   return (
@@ -59,6 +65,8 @@ export default function ProductsPage() {
           <CatalogView
             products={products}
             onConfirmarCompra={handleConfirmarCompra}
+            produtoSelecionado={produtoSelecionado}
+            setProdutoSelecionado={setProdutoSelecionado}
           />
       </div>
 

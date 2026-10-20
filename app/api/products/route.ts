@@ -12,14 +12,16 @@ export const GET = auth(async function GET(req) {
 
   const socio = req.auth.user?.type === "SOCIO";
 
+  const totals = await prisma.stock.groupBy({
+    by: ['product_id'],
+    _sum: { quantity: true },
+    having: { quantity: { _sum: { gt: 0 } } },
+  });
+
   const products = await prisma.product.findMany({
     where: {
-      stock: {
-        some: {
-          quantity: {
-            gt: 0
-          }
-        }
+      id: {
+        in: totals.map(t => t.product_id)
       }
     },
     include: {
@@ -28,6 +30,9 @@ export const GET = auth(async function GET(req) {
           quantity: {
             gt: 0
           }
+        },
+        orderBy: {
+          createdAt: 'asc',
         },
         select: {
           id: true,

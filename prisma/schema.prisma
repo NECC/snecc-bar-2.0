@@ -57,7 +57,7 @@ model Stock {
   socio_price       Decimal     @default(0) @db.Decimal(10, 2)
   nsocio_price      Decimal     @default(0) @db.Decimal(10, 2)
   createdAt         DateTime    @default(now())
-  parcel_number     Int         @default(0)
+  parcel_number     Int         @default(1)
   times_sold        PurchaseTransaction[]
   lost              LostStock[]
 

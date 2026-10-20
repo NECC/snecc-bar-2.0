@@ -18,7 +18,12 @@ export const POST = auth(async function POST(req) {
 
   try {
     const st = await prisma.stock.findFirst({
-      where: { product_id: p_id },
+      where: { 
+        product_id: p_id,
+        quantity: {
+          gt: 0,
+        } 
+      },
       orderBy: { createdAt: 'asc' },
     });
 

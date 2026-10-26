@@ -1,9 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import RechargeModal from "@/components/recharge-modal";
-import { 
-  Plus, 
+import {
   ArrowUpRight, 
   ArrowDownLeft, 
   Search,
@@ -19,6 +17,7 @@ type Transaction = {
   date: string,
   admin: string | null,
   socio: boolean | null,
+  timestamp: number,
 }
 
 const euro = new Intl.NumberFormat("pt-PT", {
@@ -47,7 +46,8 @@ export default function TransactionsPage() {
         type: tx.type == "RETIRAR" ? "Ajuste" : "Carregamento",
         amount: euro.format(tx.amount),
         admin: tx.handler,
-        date: tx.date.toLocaleString("pt-PT", { timeZone: "UTC" }),
+        date: new Date(tx.date).toLocaleString("pt-PT", {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'}),
+        timestamp: new Date(tx.date).getTime(),
         socio: null,
       }));
 
@@ -58,7 +58,8 @@ export default function TransactionsPage() {
         type: "Compra",
         amount: euro.format(-tx.price),
         admin: null,
-        date: tx.date.toLocaleString("pt-PT", { timeZone: "UTC" }),
+        date: new Date(tx.date).toLocaleString("pt-PT", {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'}),
+        timestamp: new Date(tx.date).getTime(),
         socio: tx.user_type === "SOCIO",
       }));
 
@@ -84,7 +85,7 @@ export default function TransactionsPage() {
     const matchesType = selectedType === "TODAS" || tx.type === selectedType;
 
     return matchesQuery && matchesType;
-  });
+  }).sort((a, b) => b.timestamp - a.timestamp);
 
   return (
     <div className="min-h-screen bg-white dark:bg-white text-slate-800 dark:text-slate-800 flex flex-col pb-20 md:pb-0 transition-colors duration-300">

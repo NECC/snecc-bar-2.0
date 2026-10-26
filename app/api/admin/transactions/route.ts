@@ -22,7 +22,10 @@ export const GET = auth(async function GET(req) {
                 email: true,
             }
         }
-    }
+    },
+    orderBy: {
+      date: 'desc'
+    },
   });
 
   console.log(balanceTransactions)
@@ -34,7 +37,7 @@ export const GET = auth(async function GET(req) {
       handler: transaction.handler.email,
       type: transaction.type,
       amount: transaction.amount,
-      date: transaction.date.toLocaleString("pt-PT", {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'}),
+      date: transaction.date,
     };
   });
 
@@ -55,7 +58,10 @@ export const GET = auth(async function GET(req) {
                 }
             }
         }
-    }
+    },
+    orderBy: {
+      date: 'desc'
+    },
   });
 
   const purchase_formmated = purchaseTransactions.map(transaction => {
@@ -64,7 +70,7 @@ export const GET = auth(async function GET(req) {
       user: transaction.user.email,
       price: transaction.user_type === "SOCIO" ? transaction.product_v.socio_price : transaction.product_v.nsocio_price,
       item: transaction.product_v.product.name,
-      date: transaction.date.toLocaleString("pt-PT", {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'}),
+      date: transaction.date,
       user_type: transaction.user_type,
     };
   });

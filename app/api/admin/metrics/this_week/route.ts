@@ -23,22 +23,23 @@ async function getWeekMetrics(start: Date, end: Date) {
     // Sum of all user balances as of `end`, rebuilt from the ledger
     prisma.$queryRaw<{ balance: string }[]>`
       SELECT (
-        (SELECT COALESCE(SUM(
-           CASE bt.type
-             WHEN 'CARREGAR' THEN bt.amount
-             WHEN 'RETIRAR'  THEN -bt.amount
-           END), 0)
+        (SELECT COALESCE(SUM(bt.amount), 0)
          FROM "BalanceTransaction" bt
          WHERE bt.date < ${end})
         -
-        (SELECT COALESCE(SUM(
-           CASE pt.user_type
-             WHEN 'SOCIO'   THEN s.socio_price
-             WHEN 'N_SOCIO' THEN s.nsocio_price
-           END), 0)
-         FROM "PurchaseTransaction" pt
-         JOIN "Stock" s ON s.id = pt.product_v_id
-         WHERE pt.date < ${end})
+        (SELECT COALESCE(SUM(s.acquisition_cost * (s.quantity + COALESCE(sold.cnt, 0) + COALESCE(lost.cnt, 0))), 0)
+        FROM "Stock" s 
+        LEFT JOIN (
+          SELECT product_v_id, COUNT(*) as cnt
+          FROM "PurchaseTransaction" 
+          GROUP BY product_v_id
+        ) sold ON sold.product_v_id = s.id
+        LEFT JOIN (
+          SELECT stock_id, COUNT(*) as cnt
+          FROM "LostStock"
+          GROUP BY stock_id
+        ) lost ON lost.stock_id = s.id
+        WHERE s."createdAt" < ${end})
       )::text AS balance
     `,
 
@@ -55,7 +56,7 @@ async function getWeekMetrics(start: Date, end: Date) {
   );
 
   return {
-    totalUserBalance: new Prisma.Decimal(balanceRows[0].balance).toFixed(2),
+    totalBalance: new Prisma.Decimal(balanceRows[0].balance).toFixed(2),
     profit: profit.toFixed(2),
     losses: losses.toFixed(2),
     netProfit: profit.sub(losses).toFixed(2),
@@ -102,7 +103,7 @@ export const GET = auth(async function GET(req) {
     getWeekMetrics(startOfPreviousWeek, startOfWeek),
   ]);
 
-  const keys = ["totalUserBalance", "profit", "losses", "netProfit"] as const;
+  const keys = ["totalBalance", "profit", "losses", "netProfit"] as const;
 
   const stats = Object.fromEntries(
     keys.map((k) => [

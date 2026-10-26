@@ -15,7 +15,7 @@ export const GET = auth(async function GET(req) {
   const weeks = await prisma.$queryRaw<
     {
       weekStart: string;
-      totalUserBalance: string;
+      totalBalance: string;
       profit: string;
       losses: string;
       netProfit: string;
@@ -59,13 +59,29 @@ export const GET = auth(async function GET(req) {
     ),
     deposits AS (
       SELECT date_trunc('week', bt.date + interval '1 day') - interval '1 day' AS week_start,
-             SUM(CASE bt.type WHEN 'CARREGAR' THEN bt.amount ELSE -bt.amount END) AS delta
+             SUM(bt.amount) AS delta
       FROM "BalanceTransaction" bt
+      GROUP BY 1
+    ),
+    stock_costs AS (
+      SELECT date_trunc('week', s."createdAt" + interval '1 day') - interval '1 day' AS week_start,
+            SUM(s.acquisition_cost * (s.quantity + COALESCE(sold.cnt, 0) + COALESCE(lost.cnt, 0))) AS cost
+      FROM "Stock" s
+      LEFT JOIN (
+        SELECT product_v_id, COUNT(*) AS cnt
+        FROM "PurchaseTransaction"
+        GROUP BY product_v_id
+      ) sold ON sold.product_v_id = s.id
+      LEFT JOIN (
+        SELECT stock_id, COUNT(*) AS cnt
+        FROM "LostStock"
+        GROUP BY stock_id
+      ) lost ON lost.stock_id = s.id
       GROUP BY 1
     )
     SELECT to_char(w.week_start, 'YYYY-MM-DD') AS "weekStart",
-           SUM(COALESCE(d.delta, 0) - COALESCE(p.revenue, 0))
-             OVER (ORDER BY w.week_start)::text AS "totalUserBalance",
+           SUM(COALESCE(d.delta, 0) - COALESCE(c.cost, 0))
+             OVER (ORDER BY w.week_start)::text AS "totalBalance",
            COALESCE(p.profit, 0)::text AS profit,
            COALESCE(l.losses, 0)::text AS losses,
            (COALESCE(p.profit, 0) - COALESCE(l.losses, 0))::text AS "netProfit"
@@ -73,6 +89,7 @@ export const GET = auth(async function GET(req) {
     LEFT JOIN purchases p ON p.week_start = w.week_start
     LEFT JOIN losses    l ON l.week_start = w.week_start
     LEFT JOIN deposits  d ON d.week_start = w.week_start
+    LEFT JOIN stock_costs c ON c.week_start = w.week_start
     ORDER BY w.week_start
   `;
 

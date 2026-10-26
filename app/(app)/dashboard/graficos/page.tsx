@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import RechargeModal from "@/components/recharge-modal";
 import { 
   CreditCard, 
   DollarSign, 
@@ -24,8 +23,8 @@ import {
 
 const STAT_CONFIG = [
   {
-    key: "totalUserBalance",
-    label: "Total Saldo Utilizadores",
+    key: "totalBalance",
+    label: "Saldo total no Cofre",
     icon: CreditCard,
     color: "text-blue-600",
     bgColor: "bg-blue-50",
@@ -55,14 +54,14 @@ const STAT_CONFIG = [
 
 type WeeklyMetrics = {
   weekStart: string,
-  totalUserBalance: string,
+  totalBalance: string,
   profit: string,
   losses: string,
   netProfit: string,
 }
 
 type Metrics = {
-  totalUserBalance: {
+  totalBalance: {
     current: string,
     change: number,
   };
@@ -89,7 +88,6 @@ const fmtChange = (v: number | null) =>
   v === null ? "—" : `${v > 0 ? "+" : ""}${v != 0 ? v + "%" : "Nenhuma mudança"} esta semana`;
 
 export default function AnalyticsPage() {
-  const [rechargeModalOpen, setRechargeModalOpen] = useState(false);
   const [timeRange, setTimeRange] = useState<"ALL" | "12M" | "6M" | "3M" | "1M" | "3W" | "2W" >("1M");
   const timeRangeToText = {
     "ALL": "ao longo do tempo",
@@ -102,7 +100,7 @@ export default function AnalyticsPage() {
   }
   const [weeklyMetricsData, setWeeklyMetricsData] = useState<WeeklyMetrics[]>([]);
   const [metricsData, setMetricsData] = useState<Metrics>({
-      totalUserBalance: {
+      totalBalance: {
         current: "0.00",
         change: 0.00,
       },
@@ -242,8 +240,8 @@ export default function AnalyticsPage() {
         <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-4">
             <div>
-              <h2 className="text-base font-extrabold text-slate-900">Evolução do Saldo Global dos Utilizadores</h2>
-              <p className="text-xs text-slate-400">Total acumulado na carteira virtual dos sócios {timeRangeToText[timeRange]}</p>
+              <h2 className="text-base font-extrabold text-slate-900">Evolução do Saldo do Cofre</h2>
+              <p className="text-xs text-slate-400">Total acumulado no cofre do Snecc-Bar {timeRangeToText[timeRange]}</p>
             </div>
           </div>
 
@@ -263,7 +261,7 @@ export default function AnalyticsPage() {
                   contentStyle={{ backgroundColor: "#0f172a", borderRadius: "1rem", color: "#fff", border: "none" }}
                   formatter={(value: any) => [`${Number(value).toFixed(2)}€`, "Saldo Total"]}
                 />
-                <Area type="monotone" dataKey="totalUserBalance" stroke="#2563eb" strokeWidth={3} fillOpacity={1} fill="url(#colorSaldo)" />
+                <Area type="monotone" dataKey="totalBalance" stroke="#2563eb" strokeWidth={3} fillOpacity={1} fill="url(#colorSaldo)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>

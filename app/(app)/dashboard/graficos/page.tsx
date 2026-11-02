@@ -29,7 +29,7 @@ const STAT_CONFIG = [
     color: "text-blue-600",
     bgColor: "bg-blue-50",
   },
-  {
+  /*{
     key: "profit",
     label: "Lucro",
     icon: DollarSign,
@@ -49,15 +49,15 @@ const STAT_CONFIG = [
     icon: Wallet,
     color: "text-violet-600",
     bgColor: "bg-violet-50",
-  },
+  },*/
 ] as const;
 
 type WeeklyMetrics = {
   weekStart: string,
   totalBalance: string,
-  profit: string,
+  /*profit: string,
   losses: string,
-  netProfit: string,
+  netProfit: string,*/
 }
 
 type Metrics = {
@@ -65,7 +65,7 @@ type Metrics = {
     current: string,
     change: number,
   };
-  profit: {
+  /*profit: {
     current: string,
     change: number,
   };
@@ -76,7 +76,7 @@ type Metrics = {
   netProfit: {
     current: string,
     change: number,
-  };
+  };*/
 };
 
 const euro = new Intl.NumberFormat("pt-PT", {
@@ -88,7 +88,7 @@ const fmtChange = (v: number | null) =>
   v === null ? "—" : `${v > 0 ? "+" : ""}${v != 0 ? v + "%" : "Nenhuma mudança"} esta semana`;
 
 export default function AnalyticsPage() {
-  const [timeRange, setTimeRange] = useState<"ALL" | "12M" | "6M" | "3M" | "1M" | "3W" | "2W" >("1M");
+  /*const [timeRange, setTimeRange] = useState<"ALL" | "12M" | "6M" | "3M" | "1M" | "3W" | "2W" >("1M");
   const timeRangeToText = {
     "ALL": "ao longo do tempo",
     "12M": "durante o último ano",
@@ -97,14 +97,14 @@ export default function AnalyticsPage() {
     "1M": "durante o último mês",
     "3W": "durante as últimas 3 semanas",
     "2W": "durante as últimas 2 semanas"
-  }
+  }*/
   const [weeklyMetricsData, setWeeklyMetricsData] = useState<WeeklyMetrics[]>([]);
   const [metricsData, setMetricsData] = useState<Metrics>({
       totalBalance: {
         current: "0.00",
         change: 0.00,
       },
-      profit: {
+      /*profit: {
         current: "0.00",
         change: 0.00,
       },
@@ -115,10 +115,10 @@ export default function AnalyticsPage() {
       netProfit: {
         current: "0.00",
         change: 0.00,
-      },
+      },*/
     });
   
-    const getMetricsData = async () => {
+    /*const getMetricsData = async () => {
       try {
         const general_response = await fetch("/api/admin/metrics/this_week");
         if (!general_response.ok) {
@@ -141,12 +141,12 @@ export default function AnalyticsPage() {
   
     useEffect(() => {
       getMetricsData();
-    }, []);
+    }, []);*/
   
     const STATS = STAT_CONFIG.map((s) => {
       const { current, change } = metricsData[s.key];
       const value = Number(current);
-      const negative = s.key === "netProfit" && value < 0;
+      const negative = s.key !== "totalBalance" && value < 0;
       return {
         ...s,
         val: euro.format(value),
@@ -158,7 +158,7 @@ export default function AnalyticsPage() {
   
 
   // Filtragem dinâmica do intervalo temporal selecionado
-  const getFilteredData = () => {
+  /*const getFilteredData = () => {
     switch (timeRange) {
       case "2W":
         return weeklyMetricsData.slice(-2);
@@ -175,9 +175,9 @@ export default function AnalyticsPage() {
       default:
         return weeklyMetricsData;
     }
-  };
+  };*/
 
-  const chartData = getFilteredData();
+  //const chartData = getFilteredData();
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-800 flex flex-col pb-20 md:pb-0">
@@ -195,8 +195,8 @@ export default function AnalyticsPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
-            {/* Seletor de Período Dinâmico */}
+          {/*<div className="flex items-center gap-2">
+            {/* Seletor de Período Dinâmico }
             <div className="bg-white border border-slate-200/80 p-1 rounded-xl flex items-center gap-1 shadow-sm">
               {(["2W", "3W", "1M", "3M", "6M", "12M", "ALL"] as const).map((range) => (
                 <button
@@ -212,7 +212,7 @@ export default function AnalyticsPage() {
                 </button>
               ))}
             </div>
-          </div>
+          </div>*/}
         </div>
 
         {/* 1. CARTÕES DE MÉTRICAS DETALHADAS */}
@@ -236,7 +236,7 @@ export default function AnalyticsPage() {
           })}
         </div>
 
-        {/* 2. GRÁFICO PRINCIPAL: Evolução do Saldo Total */}
+        {/*{/* 2. GRÁFICO PRINCIPAL: Evolução do Saldo Total}
         <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-4">
             <div>
@@ -267,7 +267,7 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
-        {/* 3. GRÁFICO COMPARATIVO: Lucro vs Perdas */}
+        {/* 3. GRÁFICO COMPARATIVO: Lucro vs Perdas}
         <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-4">
             <div>
@@ -292,7 +292,7 @@ export default function AnalyticsPage() {
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </div>*/}
 
       </main>
 

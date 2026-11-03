@@ -58,6 +58,7 @@ model Stock {
   createdAt         DateTime    @default(now())
   parcel_number     Int         @default(1)
   times_sold        PurchaseTransaction[]
+  lost              Int        @default(0)
 
   product           Product   @relation(fields: [product_id], references: [id])
 }

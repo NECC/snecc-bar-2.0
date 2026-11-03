@@ -56,7 +56,10 @@ export const POST = auth(async function POST(req) {
             data: {
               quantity: {
                 decrement: remainingLoss
-              }
+              },
+              lost: {
+                increment: remainingLoss
+              },
             }
           });
           remainingLoss = 0;
@@ -67,7 +70,10 @@ export const POST = auth(async function POST(req) {
             data: {
               quantity: {
                 decrement: st.quantity
-              }
+              },
+              lost: {
+                increment: st.quantity
+              },
             }
           });
           remainingLoss -= st.quantity;

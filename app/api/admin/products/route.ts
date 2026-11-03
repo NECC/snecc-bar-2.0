@@ -52,8 +52,7 @@ export const GET = auth(async function GET(req) {
       stock: {
         select: {
           id: true,
-          socio_price: true,
-          nsocio_price: true,
+          price: true,
           acquisition_cost: true,
           quantity: true,
           createdAt: true,
@@ -76,8 +75,7 @@ export const GET = auth(async function GET(req) {
       image: product.image || "",
       stock: product.stock.map(stock => ({
         id: stock.id,
-        socio_price: stock.socio_price,
-        nsocio_price: stock.nsocio_price,
+        price: stock.price.toFixed(2),
         acquisition_cost: stock.acquisition_cost,
         quantity: stock.quantity,
         acquisition_date: stock.createdAt.toLocaleDateString("pt-PT"),

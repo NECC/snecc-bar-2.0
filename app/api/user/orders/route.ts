@@ -41,8 +41,7 @@ export const GET = auth(async function GET(req) {
         id: p.id,
         date: p.date,
         image: p.product_v.product.image,
-        type: p.user_type,
-        price: p.user_type === "SOCIO" ? p.product_v.socio_price : p.product_v.nsocio_price,
+        price: p.product_v.price,
         name: p.product_v.product.name,
     }
   })

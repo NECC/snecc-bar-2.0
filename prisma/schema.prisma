@@ -14,7 +14,7 @@ model User {
   email               String                @unique
   emailVerified       DateTime?
   image               String?
-  type                Roles                 @default(N_SOCIO)
+  type                Roles                 @default(SOCIO)
   sessions            Session[]
   transactions        BalanceTransaction[]  @relation("UserAffected")
   handledTransactions BalanceTransaction[]  @relation("Handler")
@@ -54,8 +54,7 @@ model Stock {
   product_id        String
   quantity          Int
   acquisition_cost  Decimal     @default(0) @db.Decimal(10, 2)
-  socio_price       Decimal     @default(0) @db.Decimal(10, 2)
-  nsocio_price      Decimal     @default(0) @db.Decimal(10, 2)
+  price       Decimal     @default(0) @db.Decimal(10, 2)
   createdAt         DateTime    @default(now())
   parcel_number     Int         @default(1)
   times_sold        PurchaseTransaction[]
@@ -80,7 +79,6 @@ model PurchaseTransaction {
   id            String      @id @default(cuid())
   user_id       String
   product_v_id  String
-  user_type      Roles       @default(N_SOCIO)
   date          DateTime    @default(now())
 
   user          User        @relation("UserPurchases", fields: [user_id], references: [id])
@@ -104,7 +102,6 @@ model Safe {
 enum Roles {
   ADMIN
   SOCIO
-  N_SOCIO
 }
 
 enum TransactionType {

@@ -20,9 +20,8 @@ const euro = new Intl.NumberFormat("pt-PT", {
 export default function UsersManagementPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState("");
-  const [filterType, setFilterType] = useState<"ALL" | "SOCIO" | "N_SOCIO" | "ADMIN">("ALL");
+  const [filterType, setFilterType] = useState<"ALL" | "SOCIO" | "ADMIN">("ALL");
   const [rechargeModalOpen, setRechargeModalOpen] = useState(false);
-  const [removeModalOpen, setRemoveModalOpen] = useState(false);
 
   const getUserData = async () => {
     try {
@@ -95,7 +94,6 @@ export default function UsersManagementPage() {
             {[
               { label: "Todos", value: "ALL" },
               { label: "Sócios", value: "SOCIO" },
-              { label: "Não Sócios", value: "N_SOCIO" },
               { label: "Admins", value: "ADMIN" },
             ].map((f) => (
               <button
@@ -159,11 +157,6 @@ export default function UsersManagementPage() {
                     {u.type === "SOCIO" && (
                       <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-full font-bold text-[10px] flex items-center gap-1">
                         <UserCheck className="w-3 h-3" /> SÓCIO
-                      </span>
-                    )}
-                    {u.type === "N_SOCIO" && (
-                      <span className="bg-slate-100 text-slate-600 border border-slate-200 px-2.5 py-1 rounded-full font-bold text-[10px] flex items-center gap-1">
-                        <UserX className="w-3 h-3" /> NÃO SÓCIO
                       </span>
                     )}
                     {/* Saldo se disponível */}

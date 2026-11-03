@@ -41,7 +41,7 @@ export default async function HomePage() {
 
         <div className="relative z-10 flex items-center justify-center p-8">
           <Image
-            src="/logo.png"
+            src="/necc.svg"
             alt="Logo NECC"
             width={400}
             height={400}

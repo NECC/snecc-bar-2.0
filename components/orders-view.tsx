@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Tag, CreditCard, Calendar, Clock, ArrowDownLeft, ArrowUpRight } from "lucide-react";
+import { Tag, Calendar, Clock } from "lucide-react";
 
 export interface Compra {
   id: string;
@@ -93,9 +93,6 @@ export default function OrdersView({ compras }: OrdersViewProps) {
                   <div className="text-sm md:text-base font-extrabold text-slate-900">
                     -{euro.format(item.price)}
                   </div>
-                  <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full inline-block mt-0.5">
-                    {item.type}
-                  </span>
                 </div>
               </div>
             );

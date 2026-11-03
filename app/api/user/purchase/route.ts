@@ -49,7 +49,7 @@ export const POST = auth(async function POST(req) {
         });
         if (!stock) throw new PurchaseError("Produto sem stock", 409);
 
-        const price = user.type === "SOCIO" ? stock.socio_price : stock.nsocio_price;
+        const price = stock.price;
 
         
         const stockUpdate = await tx.stock.updateMany({
@@ -94,7 +94,6 @@ export const POST = auth(async function POST(req) {
                         id: stock.id 
                     } 
                 },
-                user_type: userType,
             },
         });
 

@@ -10,9 +10,9 @@ export const POST = auth(async function POST(req) {
   }
 
   const body = await req.json();
-  const { p_id, precoSocio, precoNaoSocio, precoAquisicao, stock } = body;
+  const { p_id, preco, precoAquisicao, stock } = body;
 
-  if (!p_id ||!precoSocio || !precoNaoSocio || !precoAquisicao || !stock) {
+  if (!p_id ||!preco || !precoAquisicao || !stock) {
     return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
   }
 
@@ -31,8 +31,7 @@ export const POST = auth(async function POST(req) {
 
     const st = await prisma.stock.create({
         data: {
-            socio_price: parseFloat(precoSocio),
-            nsocio_price: parseFloat(precoNaoSocio),
+            price: parseFloat(preco),
             acquisition_cost: parseFloat(precoAquisicao),
             quantity: parseInt(stock, 10),
             parcel_number: count + 1,

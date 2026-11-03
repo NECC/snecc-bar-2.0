@@ -10,51 +10,75 @@ export const POST = auth(async function POST(req) {
   }
 
   const body = await req.json();
-  const { p_id } = body;
+  const { p_id, lost } = body;
+  let remainingLoss = parseInt(lost);
 
-  if (!p_id) {
+  if (!p_id || !lost) {
     return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
   }
 
   try {
-    const st = await prisma.stock.findFirst({
+    const quantity = await prisma.stock.aggregate({
       where: { 
         product_id: p_id,
         quantity: {
           gt: 0,
         } 
       },
-      orderBy: { createdAt: 'asc' },
+      _sum: {
+        quantity: true,
+      },
     });
 
-    if(!st) {
+    if (!quantity._sum.quantity || quantity._sum.quantity <= 0) {
       return NextResponse.json({ message: "No stock found for the given product" }, { status: 404 });
     }
-
-    const loss = await prisma.lostStock.create({
-      data: {
-        stock: {
-            connect: {
-                id: st.id
-            }
-        }
-      }
-    });
-
-    if (loss) {
-      await prisma.stock.update({
-        where: { id: st.id },
-        data: {
-          quantity: {
-            decrement: 1
-          }
-        }
-      });
+      
+    if (quantity._sum.quantity < remainingLoss) {
+      return NextResponse.json({ message: "Loss is bigger than available stock" }, { status: 400 });
     }
+
+    while (remainingLoss > 0) {
+      const st = await prisma.stock.findFirst({
+        where: { 
+          product_id: p_id,
+          quantity: {
+            gt: 0,
+          } 
+        },
+        orderBy: { createdAt: 'asc' },
+      });
+
+      if (st) {
+        if (st.quantity >= remainingLoss) {
+          await prisma.stock.update({
+            where: { id: st.id },
+            data: {
+              quantity: {
+                decrement: remainingLoss
+              }
+            }
+          });
+          remainingLoss = 0;
+
+        } else {
+          await prisma.stock.update({
+            where: { id: st.id },
+            data: {
+              quantity: {
+                decrement: st.quantity
+              }
+            }
+          });
+          remainingLoss -= st.quantity;
+        }
+      } else break; // No more stock to process
+    }
+
   } catch (error) {
-    console.error("Error adding loss:", error);
-    return NextResponse.json({ message: "Error adding loss" }, { status: 500 });
+    console.error("Error registering loss:", error);
+    return NextResponse.json({ message: "Error registering loss" }, { status: 500 });
   }
 
-  return NextResponse.json({ message: "Loss added successfully" }, { status: 201 });
+  return NextResponse.json({ message: "Loss registered successfully" }, { status: 201 });
 });

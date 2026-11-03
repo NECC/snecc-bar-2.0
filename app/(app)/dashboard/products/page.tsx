@@ -4,14 +4,19 @@ import { useState, useEffect } from "react";
 import NewProductModal from "@/components/new-product-modal";
 import { 
   Plus,
-  Package
+  Package,
+  Warehouse
 } from "lucide-react";
 import ProductsView, { Product } from "@/components/products-view";
 import AddStockModal from "@/components/update-product-modal";
+import LostStockModal, { LostProduct } from "@/components/lost-stock-modal";
 
 export default function DashboardProductsPage() {
   const [addStockModalOpen, setAddStockModalOpen] = useState(false);
   const [newProductModalOpen, setNewProductModalOpen] = useState(false);
+  const [lostStockModalOpen, setLostStockModalOpen] = useState(false);
+  const [product, setProduct] = useState<LostProduct | null>(null);
+  const [productId, setProductId] = useState<string | null>(null);
 
   const [products, setProducts] = useState<Product[]>([]);
 
@@ -28,27 +33,23 @@ export default function DashboardProductsPage() {
     }
   };
 
-  const lostStock = async (id: string) => {
-    try {
-      const response = await fetch(`/api/admin/products/stock/losses`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ p_id: id }),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to register loss");
-      }
-      getProductsData();
-    } catch (error) {
-      console.error("Error registering loss:", error);
-    }
-  };
-
   useEffect(() => {
     getProductsData();
   }, []);
+
+  useEffect(() => {
+    if (productId) {
+      const selectedProduct = products.find(p => p.id === productId);
+      if (selectedProduct) {
+        setProduct({
+          name: selectedProduct.name,
+          id: selectedProduct.id,
+          image: selectedProduct.image,
+          totalStock: selectedProduct.stock.map(s => s.quantity).reduce((acc, curr) => acc + curr, 0),
+        });
+      }
+    }
+  }, [productId]);
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-800 flex flex-col pb-20 md:pb-0">
@@ -58,7 +59,8 @@ export default function DashboardProductsPage() {
         {/* Título & Ações Rápidas */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
+              <Warehouse className="w-7 h-7 text-blue-600" />
               Produtos e Stock
             </h1>
             <p className="text-xs md:text-sm text-slate-500 mt-1">
@@ -92,7 +94,7 @@ export default function DashboardProductsPage() {
           </div>
 
           <div className="divide-y divide-slate-100">
-            <ProductsView products={products} lostStock={lostStock} />
+            <ProductsView products={products} setLostStockModalOpen={setLostStockModalOpen} setProductId={setProductId} />
           </div>
         </div>
       </main>
@@ -113,6 +115,17 @@ export default function DashboardProductsPage() {
           getProductsData()
         }}
         productIDs={products.map(product => ({ id: product.id, name: product.name }))}
+      />
+
+      <LostStockModal 
+        isOpen={lostStockModalOpen} 
+        onClose={() => {
+          setLostStockModalOpen(false)
+          setProductId(null)
+          setProduct(null)
+        }} 
+        product={product}
+        onSuccess={getProductsData}
       />
 
     </div>

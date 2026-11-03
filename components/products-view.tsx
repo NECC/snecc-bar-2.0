@@ -23,11 +23,12 @@ export interface Product {
 
 interface ProductsViewProps {
   products: Product[];
-  lostStock: (id: string) => void;
+  setLostStockModalOpen: (open: boolean) => void;
+  setProductId: (id: string | null) => void;
 }
 
 
-export default function ProductsView({ products, lostStock }: ProductsViewProps) {
+export default function ProductsView({ products, setLostStockModalOpen, setProductId }: ProductsViewProps) {
 
     const [expandedProductId, setExpandedProductId] = useState<string | null>(null);
 
@@ -56,7 +57,10 @@ export default function ProductsView({ products, lostStock }: ProductsViewProps)
                 </div>
 
                 <button
-                  onClick={() => lostStock(product.id)}
+                  onClick={() => {
+                    setProductId(product.id);
+                    setLostStockModalOpen(true);
+                  }}
                   aria-label="Hide product details"
                   aria-expanded={true}
                   className="mr-4 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full

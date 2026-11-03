@@ -16,7 +16,6 @@ type Transaction = {
   amount: string,
   date: string,
   admin: string | null,
-  socio: boolean | null,
   timestamp: number,
 }
 
@@ -48,7 +47,6 @@ export default function TransactionsPage() {
         admin: tx.handler,
         date: new Date(tx.date).toLocaleString("pt-PT", {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'}),
         timestamp: new Date(tx.date).getTime(),
-        socio: null,
       }));
 
       const fromPurchase = (data.p_transactions ?? []).map((tx: any) => ({
@@ -60,7 +58,6 @@ export default function TransactionsPage() {
         admin: null,
         date: new Date(tx.date).toLocaleString("pt-PT", {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'}),
         timestamp: new Date(tx.date).getTime(),
-        socio: tx.user_type === "SOCIO",
       }));
 
       setTransactions([...fromBalance, ...fromPurchase]);
@@ -182,8 +179,6 @@ export default function TransactionsPage() {
                       <div className="text-[11px] text-slate-500 dark:text-slate-500 flex items-center gap-2 mt-0.5">
                         <span>{tx.date}</span>
                         <div className={`${!tx.item ? "hidden" : ""} flex items-center gap-2`}>
-                          <span> • </span>
-                          <span>{tx.socio ? "SOCIO" : "N_SOCIO"}</span>
                           <span> • </span>
                           <span> {tx.item} </span>
                         </div>

@@ -16,7 +16,6 @@ export const GET = auth(async function GET(req) {
       const newSafe = await prisma.safe.create({
         data: {
           balance: Prisma.Decimal(0),
-          last_updated: new Date(),
         },
       });
       return NextResponse.json({ totalBalance: newSafe.balance.toString(), lastUpdate: newSafe.last_updated }, { status: 200 });

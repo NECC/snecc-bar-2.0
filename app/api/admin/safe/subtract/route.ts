@@ -26,10 +26,13 @@ export const POST = auth(async function POST(req) {
     if (!result) {
       await prisma.safe.create({
         data: {
-            balance: -amount,
+            balance: Prisma.Decimal(0),
         },
       });
     } else {
+      if (result.balance.lt(amount)) {
+        return NextResponse.json({ message: "Cannot subtract more than available balance" }, { status: 400 });
+      }
       await prisma.safe.update({
         where: { id: result.id },
         data: {

@@ -27,6 +27,13 @@ export const POST = auth(async function POST(req) {
 
     if (!user) throw new Error("User not found");
 
+    if (balance < 0 && user.balance?.lt(amount.abs())) {
+        return NextResponse.json({ message: "Cannot take more balance than available" }, { status: 400 });
+    }
+
+    const safe = await prisma.safe.findFirst();
+    if (!safe) throw new Error("Safe not found");
+
     const result = await prisma.$transaction([
         prisma.user.update({
             where: {
@@ -53,7 +60,18 @@ export const POST = auth(async function POST(req) {
                 amount: amount,
                 type: amount.gt(0) ? "CARREGAR" : "RETIRAR",
             }
-        })
+        }),
+        prisma.safe.update({
+            where: {
+                id: safe.id,
+            },
+            data: {
+                balance: {
+                    increment: amount,
+                },
+                last_updated: new Date(),
+            }
+        })      
     ])
   } catch (error) {
     console.error("Error adding stock:", error);

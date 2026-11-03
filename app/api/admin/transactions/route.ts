@@ -28,8 +28,6 @@ export const GET = auth(async function GET(req) {
     },
   });
 
-  console.log(balanceTransactions)
-
   const balance_formmated = balanceTransactions.map(transaction => {
     return {
       id: transaction.id,

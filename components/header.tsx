@@ -2,9 +2,9 @@
 
 import { UtensilsCrossed, Receipt, CheckCircle2, LogOut, LayoutDashboard, UserShield } from "lucide-react";
 import { LuUtensilsCrossed } from "react-icons/lu";
+import { BsSafe } from "react-icons/bs";
 import { IoReceiptOutline } from "react-icons/io5";
 import { RiUserSearchLine } from "react-icons/ri";
-import { GoGraph } from "react-icons/go";
 import { signOutAction } from "@/app/actions/auth";
 import { MdOutlineFastfood } from "react-icons/md";
 import { usePathname } from "next/navigation";
@@ -17,7 +17,7 @@ const pathsToNames: Record<string, string> = {
   "/dashboard/transactions": "transactions",
   "/dashboard/products": "products",
   "/dashboard/users" : "users",
-  "/dashboard/graficos" : "graficos"
+  "/dashboard/cofre" : "cofre"
 };
 
 interface User {
@@ -29,6 +29,11 @@ interface User {
 interface UserInterface {
     user: User
 }
+
+const euro = new Intl.NumberFormat("pt-PT", {
+  style: "currency",
+  currency: "EUR",
+});
 
 export default function Header(userInterface: UserInterface) {
     const pathname = usePathname()
@@ -114,15 +119,15 @@ export default function Header(userInterface: UserInterface) {
                 </button>
 
                 <button
-                    onClick={() => router.push("/dashboard/graficos")}
+                    onClick={() => router.push("/dashboard/cofre")}
                     className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold transition ${
-                    abaAtiva === "graficos"
+                    abaAtiva === "cofre"
                         ? "bg-white text-blue-600 shadow-sm"
                         : "text-slate-600 hover:text-slate-900"
                     }`}
                 >
-                    <GoGraph className="w-4 h-4" />
-                    Gráficos
+                    <BsSafe className="w-4 h-4" />
+                    Cofre
                 </button>
                 </nav>}
             </div>
@@ -137,7 +142,7 @@ export default function Header(userInterface: UserInterface) {
                     )}
                 </span>
                 <span className="text-md font-semibold text-slate-500">
-                    Saldo: <strong className="text-blue-600 font-extrabold">{user.saldo}€</strong>
+                    Saldo: <strong className="text-blue-600 font-extrabold">{euro.format(user.saldo)}</strong>
                 </span>
                 </div>
     

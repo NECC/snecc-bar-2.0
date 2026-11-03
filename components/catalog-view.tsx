@@ -15,13 +15,20 @@ interface CatalogViewProps {
   onConfirmarCompra: (id: string) => void;
   produtoSelecionado: Product | null;
   setProdutoSelecionado: Dispatch<SetStateAction<Product | null>>;
+  loading: boolean;
 }
+
+const euro = new Intl.NumberFormat("pt-PT", {
+  style: "currency",
+  currency: "EUR",
+});
 
 export default function CatalogView({
   products,
   onConfirmarCompra,
   produtoSelecionado,
-  setProdutoSelecionado
+  setProdutoSelecionado,
+  loading
 }: CatalogViewProps) {
 
   const fecharModal = () => setProdutoSelecionado(null);
@@ -67,7 +74,7 @@ export default function CatalogView({
                 </h3>
                 <div className="flex items-baseline justify-between mt-1.5">
                   <span className="text-sm md:text-base font-extrabold text-blue-600">
-                    {prod.preco}€
+                    {euro.format(prod.preco)}
                   </span>
                 </div>
               </div>
@@ -99,23 +106,25 @@ export default function CatalogView({
 
             {/* Preço */}
             <div className="text-2xl font-black text-blue-600">
-              {produtoSelecionado.preco}€
+              {euro.format(produtoSelecionado.preco)}
             </div>
 
             {/* Botões de Ação */}
             <div className="w-full flex gap-3 pt-2">
               <button
+                disabled={loading}
                 onClick={fecharModal}
                 className="flex-1 py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition"
               >
                 Cancelar
               </button>
               <button
+                disabled={loading}
                 onClick={handleConfirmar}
-                className="flex-1 py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-200 transition flex items-center justify-center gap-1.5"
+                className={`${loading ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"} flex-1 py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-200 transition flex items-center justify-center gap-1.5`}
               >
-                Confirmar
-                <ArrowRight className="w-4 h-4" />
+                {loading ? "Processando..." : "Confirmar"}
+                {!loading && <ArrowRight className="w-4 h-4" />}
               </button>
             </div>
 

@@ -27,7 +27,7 @@ export const POST = auth(async function POST(req) {
 
     if (!user) throw new Error("User not found");
 
-    if (balance < 0 && user.balance?.lt(amount.abs())) {
+    if (amount.lt(Prisma.Decimal(0)) && user.balance?.lt(amount.abs())) {
         return NextResponse.json({ message: "Cannot take more balance than available" }, { status: 400 });
     }
 

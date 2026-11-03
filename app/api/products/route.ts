@@ -10,8 +10,6 @@ export const GET = auth(async function GET(req) {
     return NextResponse.json({ message: "Admins can't buy products" }, { status: 403 });
   }
 
-  const socio = req.auth.user?.type === "SOCIO";
-
   const totals = await prisma.stock.groupBy({
     by: ['product_id'],
     _sum: { quantity: true },
@@ -36,8 +34,7 @@ export const GET = auth(async function GET(req) {
         },
         select: {
           id: true,
-          socio_price: true,
-          nsocio_price: true,
+          price: true,
         },
         take: 1,
       }
@@ -47,7 +44,7 @@ export const GET = auth(async function GET(req) {
   const results = products.map(product => {
     return {
       id: product.id,
-      preco: socio ? product.stock[0].socio_price.toFixed(2) : product.stock[0].nsocio_price.toFixed(2),
+      preco: product.stock[0].price.toFixed(2),
       nome: product.name,
       imagem: product.image || "",
     };

@@ -5,8 +5,7 @@ import { useState } from "react";
 
 export interface Stock {
   id: string;
-  socio_price: string;
-  nsocio_price: string;
+  price: string;
   acquisition_cost: string;
   quantity: number;
   acquisition_date: string;
@@ -92,8 +91,7 @@ export default function ProductsView({ products, lostStock }: ProductsViewProps)
                         <th className="py-2 pr-4 font-medium">Data de Aquisição</th>
                         <th className="py-2 pr-4 font-medium">Stock restante</th>
                         <th className="py-2 pr-4 font-medium">Stock perdido</th>
-                        <th className="py-2 pr-4 font-medium">Preço Sócio</th>
-                        <th className="py-2 pr-4 font-medium">Preço N/Sócio</th>
+                        <th className="py-2 pr-4 font-medium">Preço Venda</th>
                         <th className="py-2 font-medium">Preço Aquisição</th>
                       </tr>
                     </thead>
@@ -104,8 +102,7 @@ export default function ProductsView({ products, lostStock }: ProductsViewProps)
                           <td className="py-1 pr-4">{stock.acquisition_date}</td>
                           <td className="py-1 pr-4">{stock.quantity}</td>
                           <td className="py-1 pr-4">{stock.lost}</td>
-                          <td className="py-1 pr-4">€{Number.parseFloat(stock.socio_price).toFixed(2)}</td>
-                          <td className="py-1 pr-4">€{Number.parseFloat(stock.nsocio_price).toFixed(2)}</td>
+                          <td className="py-1 pr-4">€{Number.parseFloat(stock.price).toFixed(2)}</td>
                           <td className="py-1">€{Number.parseFloat(stock.acquisition_cost).toFixed(2)}</td>
                         </tr>
                       ))}

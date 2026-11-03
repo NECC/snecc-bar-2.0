@@ -11,6 +11,7 @@ export default function ProductsPage() {
 
   const [products, setProducts] = useState<Product[]>([]);
   const [produtoSelecionado, setProdutoSelecionado] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const fetchProducts = async () => {
     try {
@@ -32,6 +33,7 @@ export default function ProductsPage() {
 
   // Handler para processar a compra individual
   const handleConfirmarCompra = async (id: string) => {
+    setLoading(true);
     try {
       const response = await fetch("/api/user/purchase", {
         method: "POST",
@@ -43,7 +45,7 @@ export default function ProductsPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error("Failed to purchase product");
+        throw new Error(data.message || "Erro ao comprar produto");
       }
 
       toast.success(data.message);
@@ -51,9 +53,10 @@ export default function ProductsPage() {
       fetchProducts();
     } catch (error) {
       console.error("Error buying product:", error);
-      toast.error("Compra do produto falhou");
+      toast.error(error instanceof Error ? error.message : "Erro ao comprar produto");
     } finally {
       setProdutoSelecionado(null);
+      setLoading(false);
     }
   };
 
@@ -67,6 +70,7 @@ export default function ProductsPage() {
             onConfirmarCompra={handleConfirmarCompra}
             produtoSelecionado={produtoSelecionado}
             setProdutoSelecionado={setProdutoSelecionado}
+            loading={loading}
           />
       </div>
 

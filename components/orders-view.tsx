@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Tag, Calendar, Clock } from "lucide-react";
+import { Tag, Calendar, Clock, ShoppingBag } from "lucide-react";
 
 export interface Compra {
   id: string;
@@ -23,127 +23,119 @@ const euro = new Intl.NumberFormat("pt-PT", {
 
 export default function OrdersView({ compras }: OrdersViewProps) {
   const [subAba, setSubAba] = useState<"compras" | "saldo">("compras");
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
 
   const formatarData = (isoString: string) => {
     const d = new Date(isoString);
     return {
-      data: d.toLocaleDateString("pt-PT", { day: "2-digit", month: "short" }),
+      data: d.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit" }),
       hora: d.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" }),
     };
   };
 
+  const handleImageError = (id: string) => {
+    setFailedImages((prev) => ({ ...prev, [id]: true }));
+  };
+
+  // Ordena as compras por data decrescente (mais recentes no topo) e limita às últimas 5
+  const ultimasCompras = [...compras]
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 5);
+
   return (
-    <main className="flex-1 min-w-0 max-w-4xl mx-auto w-full">
-      <div className="mb-6">
-        <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
-          Histórico
-        </h1>
+    <main className="flex-1 min-w-0 max-w-3xl mx-auto w-full px-4 py-8">
+      {/* Cabeçalho */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
+            Histórico
+          </h1>
+          <p className="text-xs md:text-sm text-slate-500 mt-0.5">
+            Consulta as tuas últimas movimentações e compras no bar
+          </p>
+        </div>
+
+        {/* Botão de Aba / Filtro */}
+        <div className="inline-flex bg-slate-100 p-1 rounded-2xl border border-slate-200/60 self-start sm:self-auto">
+          <button
+            onClick={() => setSubAba("compras")}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
+              subAba === "compras"
+                ? "bg-white text-blue-600 shadow-sm border border-slate-200/50"
+                : "text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            <Tag className="w-3.5 h-3.5 text-blue-600" />
+            Compras de Snacks
+          </button>
+        </div>
       </div>
 
-      {/* Alternador */}
-      <div className="flex bg-slate-200/70 p-1 rounded-2xl mb-6 max-w-md">
-        <button
-          onClick={() => setSubAba("compras")}
-          className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 ${
-            subAba === "compras" ? "bg-white text-blue-600 shadow-sm" : "text-slate-600 hover:text-slate-900"
-          }`}
-        >
-          <Tag className="w-4 h-4" />
-          Compras de Snacks
-        </button>
-      </div>
-
-      {/* Compras de Snacks */}
+      {/* Lista de Compras */}
       {subAba === "compras" && (
         <div className="space-y-3">
-          {compras.map((item) => {
-            const { data, hora } = formatarData(item.date);
-            return (
-              <div
-                key={item.id}
-                className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center justify-between gap-4 transition hover:border-slate-300"
-              >
-                <div className="flex items-center gap-3.5 min-w-0">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-12 h-12 rounded-xl object-cover bg-slate-50 border border-slate-100 flex-shrink-0"
-                  />
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
+          {ultimasCompras.length === 0 ? (
+            <div className="bg-white rounded-3xl p-12 text-center border border-slate-200/80 shadow-xs">
+              <ShoppingBag className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+              <p className="text-slate-500 text-sm font-semibold">
+                Ainda não efetuaste nenhuma compra.
+              </p>
+            </div>
+          ) : (
+            ultimasCompras.map((item) => {
+              const { data, hora } = formatarData(item.date);
+              const hasImageError = failedImages[item.id] || !item.image;
+
+              return (
+                <div
+                  key={item.id}
+                  className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-200 flex items-center justify-between gap-4"
+                >
+                  {/* Imagem + Nome e Detalhes */}
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <div className="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200/60 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                      {!hasImageError ? (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          onError={() => handleImageError(item.id)}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <ShoppingBag className="w-5 h-5 text-slate-400" />
+                      )}
+                    </div>
+
+                    <div className="min-w-0">
                       <h4 className="font-bold text-slate-900 text-sm md:text-base truncate">
                         {item.name}
                       </h4>
-                    </div>
 
-                    <div className="flex items-center gap-3 text-slate-400 text-xs mt-1">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-3.5 h-3.5" />
-                        {data}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5" />
-                        {hora}
-                      </span>
+                      <div className="flex items-center gap-3 text-slate-400 text-xs mt-1 font-medium">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                          {data}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3.5 h-3.5 text-slate-400" />
+                          {hora}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="text-right flex-shrink-0">
-                  <div className="text-sm md:text-base font-extrabold text-slate-900">
-                    -{euro.format(item.price)}
+                  {/* Valor do Preço */}
+                  <div className="text-right flex-shrink-0">
+                    <span className="inline-block px-3 py-1.5 rounded-xl bg-rose-50 border border-rose-100 text-rose-700 font-black text-sm md:text-base">
+                      -{euro.format(item.price)}
+                    </span>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
       )}
-
-      {/* Movimentos de Saldo */}
-      {/*{subAba === "saldo" && (
-        <div className="space-y-3">
-          {movimentosSaldo.map((item) => {
-            const { data, hora } = formatarData(item.data);
-            const isCarregar = item.type === "CARREGAR";
-
-            return (
-              <div
-                key={item.id}
-                className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center justify-between gap-4"
-              >
-                <div className="flex items-center gap-3.5">
-                  <div
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                      isCarregar ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"
-                    }`}
-                  >
-                    {isCarregar ? <ArrowDownLeft className="w-5 h-5" /> : <ArrowUpRight className="w-5 h-5" />}
-                  </div>
-
-                  <div>
-                    <h4 className="font-bold text-slate-900 text-sm">
-                      {isCarregar ? "Carregamento de Saldo" : "Retirada de Saldo"}
-                    </h4>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Efetuado por: <span className="font-semibold text-slate-700">{item.responsavel}</span>
-                    </p>
-                  </div>
-                </div>
-
-                <div className="text-right">
-                  <div className={`text-sm md:text-base font-extrabold ${isCarregar ? "text-emerald-600" : "text-rose-600"}`}>
-                    {isCarregar ? "+" : "-"}{item.montante.toFixed(2)}€
-                  </div>
-                  <div className="text-[11px] text-slate-400 mt-0.5">
-                    {data} às {hora}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}*/}
     </main>
   );
 }

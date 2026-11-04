@@ -10,9 +10,9 @@ export const POST = auth(async function POST(req) {
   }
 
   const body = await req.json();
-  const { nome, precoSocio, precoNaoSocio, precoAquisicao, stock, imagem } = body;
+  const { nome, preco, precoAquisicao, stock, imagem } = body;
 
-  if (!nome || !precoSocio || !precoNaoSocio || !precoAquisicao || !stock) {
+  if (!nome || !preco || !precoAquisicao || !stock) {
     return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
   }
 
@@ -23,8 +23,7 @@ export const POST = auth(async function POST(req) {
         image: imagem || null,
         stock: {
           create: {
-            socio_price: parseFloat(precoSocio),
-            nsocio_price: parseFloat(precoNaoSocio),
+            price: parseFloat(preco),
             acquisition_cost: parseFloat(precoAquisicao),
             quantity: parseInt(stock, 10),
           },
@@ -57,9 +56,7 @@ export const GET = auth(async function GET(req) {
           quantity: true,
           createdAt: true,
           parcel_number: true,
-          _count: {
-            select: { lost: true },
-          },
+          lost: true,
         },
         orderBy: {
           createdAt: 'asc',
@@ -80,7 +77,7 @@ export const GET = auth(async function GET(req) {
         quantity: stock.quantity,
         acquisition_date: stock.createdAt.toLocaleDateString("pt-PT"),
         parcel_number: stock.parcel_number,
-        lost: stock._count.lost,
+        lost: stock.lost,
       })),
     };
   });

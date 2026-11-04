@@ -13,8 +13,7 @@ interface ProductModalProps {
 export default function AddStockModal({ isOpen, onClose, productIDs }: ProductModalProps) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    precoSocio: "",
-    precoNaoSocio: "",
+    preco: "",
     precoAquisicao: "",
     stock: "",
     p_id: "",
@@ -42,8 +41,7 @@ export default function AddStockModal({ isOpen, onClose, productIDs }: ProductMo
       const data = await response.json();
       toast.success(data.message);
       setFormData({
-        precoSocio: "",
-        precoNaoSocio: "",
+        preco: "",
         precoAquisicao: "",
         stock: "",
         p_id: "",
@@ -99,29 +97,17 @@ export default function AddStockModal({ isOpen, onClose, productIDs }: ProductMo
             </div>
           </div>
 
-          <div className="grid grid-cols-2 grid-rows-2 gap-3">
+          <div className="grid grid-cols-2 grid-rows-1 gap-3">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Preço Sócio (€)</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Preço de Venda (€)</label>
               <input
                 type="number"
-                step="0.05"
+                step="0.01"
+                min="0.01"
                 required
                 placeholder="0.80"
-                value={formData.precoSocio}
-                onChange={(e) => setFormData({ ...formData, precoSocio: e.target.value })}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-blue-600 focus:bg-white transition"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Preço N/Sócio (€)</label>
-              <input
-                type="number"
-                step="0.05"
-                required
-                placeholder="1.00"
-                value={formData.precoNaoSocio}
-                onChange={(e) => setFormData({ ...formData, precoNaoSocio: e.target.value })}
+                value={formData.preco}
+                onChange={(e) => setFormData({ ...formData, preco: e.target.value })}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-blue-600 focus:bg-white transition"
               />
             </div>
@@ -130,7 +116,8 @@ export default function AddStockModal({ isOpen, onClose, productIDs }: ProductMo
               <label className="block text-xs font-bold text-slate-700 mb-1">Preço Aquisição (€)</label>
               <input
                 type="number"
-                step="0.05"
+                step="0.01"
+                min="0.01"
                 required
                 placeholder="0.10"
                 value={formData.precoAquisicao}
@@ -138,18 +125,20 @@ export default function AddStockModal({ isOpen, onClose, productIDs }: ProductMo
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-blue-600 focus:bg-white transition"
               />
             </div>
+          </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Quantidade Stock</label>
-              <input
-                type="number"
-                required
-                placeholder="10"
-                value={formData.stock}
-                onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-blue-600 focus:bg-white transition"
-              />
-            </div>
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Quantidade Stock</label>
+            <input
+              type="number"
+              required
+              placeholder="10"
+              min="1"
+              step="1"
+              value={formData.stock}
+              onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-blue-600 focus:bg-white transition"
+            />
           </div>
 
           <button

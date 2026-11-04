@@ -68,14 +68,10 @@ export const GET = auth(async function GET(req) {
     return {
       id: transaction.id,
       user: transaction.user.email,
-      price:
-        transaction.user.type === "SOCIO"
-          ? transaction.product_v.product.socio_price
-          : transaction.product_v.product.nsocio_price,
+      price: transaction.product_v.price,
       item: transaction.product_v.product.name,
       date: transaction.date,
-      user_type: transaction.user.type,
-    }; // Mudei isto aqui porque dava erro na vercel
+    };
   });
 
   return NextResponse.json(

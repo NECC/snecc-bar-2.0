@@ -58,7 +58,7 @@ model Stock {
   createdAt         DateTime    @default(now())
   parcel_number     Int         @default(1)
   times_sold        PurchaseTransaction[]
-  lost              LostStock[]
+  lost              Int        @default(0)
 
   product           Product   @relation(fields: [product_id], references: [id])
 }
@@ -83,14 +83,6 @@ model PurchaseTransaction {
 
   user          User        @relation("UserPurchases", fields: [user_id], references: [id])
   product_v     Stock       @relation(fields: [product_v_id], references: [id])
-}
-
-model LostStock {
-  id            String      @id @default(cuid())
-  stock_id      String
-  date          DateTime    @default(now())
-
-  stock         Stock       @relation(fields: [stock_id], references: [id])
 }
 
 model Safe {

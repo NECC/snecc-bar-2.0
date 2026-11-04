@@ -12,23 +12,23 @@ export const GET = auth(async function GET(req) {
 
   const balanceTransactions = await prisma.balanceTransaction.findMany({
     include: {
-        user: {
-            select: {
-                email: true,
-            }
+      user: {
+        select: {
+          email: true,
         },
-        handler: {
-            select: {
-                email: true,
-            }
-        }
+      },
+      handler: {
+        select: {
+          email: true,
+        },
+      },
     },
     orderBy: {
-      date: 'desc'
+      date: "desc",
     },
   });
 
-  const balance_formmated = balanceTransactions.map(transaction => {
+  const balance_formmated = balanceTransactions.map((transaction) => {
     return {
       id: transaction.id,
       user: transaction.user.email,
@@ -41,28 +41,30 @@ export const GET = auth(async function GET(req) {
 
   const purchaseTransactions = await prisma.purchaseTransaction.findMany({
     include: {
-        user: {
-            select: {
-                email: true,
-                type: true,
-            }
+      user: {
+        select: {
+          email: true,
+          type: true,
         },
-        product_v: {
-            include: {
-                product: {
-                  select: {
-                    name: true,
-                  }
-                }
-            }
-        }
+      },
+      product_v: {
+        include: {
+          product: {
+            select: {
+              name: true,
+              socio_price: true,
+              nsocio_price: true, 
+            },
+          },
+        },
+      },
     },
     orderBy: {
-      date: 'desc'
+      date: "desc",
     },
   });
 
-  const purchase_formmated = purchaseTransactions.map(transaction => {
+  const purchase_formmated = purchaseTransactions.map((transaction) => {
     return {
       id: transaction.id,
       user: transaction.user.email,
@@ -72,5 +74,8 @@ export const GET = auth(async function GET(req) {
     };
   });
 
-  return NextResponse.json({ b_transactions: balance_formmated, p_transactions: purchase_formmated }, { status: 200 });
+  return NextResponse.json(
+    { b_transactions: balance_formmated, p_transactions: purchase_formmated },
+    { status: 200 },
+  );
 });

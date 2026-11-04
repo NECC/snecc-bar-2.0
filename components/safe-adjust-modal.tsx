@@ -124,19 +124,9 @@ export default function SafeAdjustModal({
 
             <div className="flex gap-2 pt-2">
               <button
-                type="button"
-                onClick={() => {
-                  setAmount("");
-                }}
-                disabled={loading}
-                className="w-1/3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl text-xs transition cursor-pointer disabled:opacity-50"
-              >
-                Voltar
-              </button>
-              <button
                 type="submit"
                 disabled={loading || !amount}
-                className={`${subtract ? "bg-rose-600 hover:bg-rose-700" : "bg-emerald-600 hover:bg-emerald-700"} w-2/3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md shadow-emerald-200 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed`}
+                className={`${subtract ? "bg-rose-600 hover:bg-rose-700" : "bg-emerald-600 hover:bg-emerald-700"} mx-auto w-1000 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md shadow-emerald-200 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 {loading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

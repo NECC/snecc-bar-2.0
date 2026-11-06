@@ -3,40 +3,29 @@
 import { useState, useEffect } from "react";
 import { 
   CreditCard, 
-  DollarSign, 
-  TrendingDown, 
-  BarChart3, 
-  Wallet,
-  Minus,
-  HandCoins
+  HandCoins,
+  TrendingUp,
+  TrendingDown,
+  Minus
 } from "lucide-react";
+import { BsSafe } from "react-icons/bs";
 import SafeAdjustModal from "@/components/safe-adjust-modal";
 
-const STAT_CONFIG = [
-  {
-    key: "totalBalance",
-    label: "Saldo total no Cofre",
-    icon: CreditCard,
-    color: "text-blue-600",
-    bgColor: "bg-blue-50",
-  },
-] as const;
-
 type SafeInfo = {
-  totalBalance: string,
-  lastUpdate: string,
-}
+  totalBalance: string;
+  lastUpdate: string;
+};
 
 const euro = new Intl.NumberFormat("pt-PT", {
-    style: "currency",
-    currency: "EUR",
-  });
+  style: "currency",
+  currency: "EUR",
+});
 
 export default function SafePage() {
   const [adjustModalOpen, setAdjustModalOpen] = useState(false);
   const [safeData, setSafeData] = useState<SafeInfo>({
     totalBalance: "0.00",
-    lastUpdate: ""
+    lastUpdate: "",
   });
 
   const getSafeData = async () => {
@@ -56,17 +45,19 @@ export default function SafePage() {
     getSafeData();
   }, []);
 
-  const STATS = STAT_CONFIG.map((s) => {
-    const bal = safeData[s.key];
-    const value = Number(bal);
-    const negative = value < 0;
-    return {
-      ...s,
-      val: euro.format(value),
-      color: negative ? "text-rose-600" : s.color,
-      bgColor: negative ? "bg-rose-50" : s.bgColor,
-    };
-  });
+  const balanceValue = Number(safeData.totalBalance);
+  const isProfit = balanceValue > 0;
+  const isLoss = balanceValue < 0;
+
+  // Configuração dinâmica do cartão de Lucro/Prejuízo
+  const financialStatus = {
+    label: isProfit ? "Em Lucro" : isLoss ? "Em Prejuízo" : "Neutro",
+    val: euro.format(balanceValue),
+    color: isProfit ? "text-emerald-600" : isLoss ? "text-rose-600" : "text-slate-600",
+    bgColor: isProfit ? "bg-emerald-50" : isLoss ? "bg-rose-50" : "bg-slate-100",
+    borderColor: isProfit ? "border-emerald-200" : isLoss ? "border-rose-200" : "border-slate-200",
+    Icon: isProfit ? TrendingUp : isLoss ? TrendingDown : Minus,
+  };
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-800 flex flex-col pb-20 md:pb-0">
@@ -76,7 +67,7 @@ export default function SafePage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
-              <BarChart3 className="w-7 h-7 text-blue-600" />
+              <BsSafe className="w-7 h-7 text-blue-600" />
               Cofre do Snecc-Bar
             </h1>
             <p className="text-xs md:text-sm text-slate-500 mt-1">
@@ -95,22 +86,35 @@ export default function SafePage() {
           </div>
         </div>
 
-        {/* 1. CARTÕES DE MÉTRICAS DETALHADAS */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {STATS.map((stat, i) => {
-            const Icon = stat.icon;
-            return (
-              <div key={i} className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
-                <div>
-                  <span className="text-xs font-semibold text-slate-500">{stat.label}</span>
-                  <div className="text-xl md:text-2xl font-black text-slate-900 mt-1">{stat.val}</div>
-                </div>
-                <div className={`w-12 h-12 ${stat.bgColor} ${stat.color} rounded-2xl flex items-center justify-center flex-shrink-0`}>
-                  <Icon className="w-6 h-6" />
-                </div>
+        {/* 1. CARTÕES DE MÉTRICAS LADO A LADO */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+          
+          {/* Cartão 1: Saldo total no Cofre */}
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+            <div>
+              <span className="text-xs font-semibold text-slate-500">Saldo total no Cofre</span>
+              <div className="text-xl md:text-2xl font-black text-slate-900 mt-1">
+                {euro.format(balanceValue)}
               </div>
-            );
-          })}
+            </div>
+            <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+              <CreditCard className="w-6 h-6" />
+            </div>
+          </div>
+
+          {/* Cartão 2: Estado Financeiro (Lucro vs Prejuízo) */}
+          <div className={`bg-white p-5 rounded-2xl border ${financialStatus.borderColor} shadow-sm flex items-center justify-between`}>
+            <div>
+              <span className="text-xs font-semibold text-slate-500">Balanço do Cofre</span>
+              <div className={`text-xl md:text-2xl font-black ${financialStatus.color} mt-1 flex items-center gap-2`}>
+                {financialStatus.label}
+              </div>
+            </div>
+            <div className={`w-12 h-12 ${financialStatus.bgColor} ${financialStatus.color} rounded-2xl flex items-center justify-center flex-shrink-0`}>
+              <financialStatus.Icon className="w-6 h-6" />
+            </div>
+          </div>
+
         </div>
 
         <SafeAdjustModal
@@ -120,7 +124,6 @@ export default function SafePage() {
         /> 
 
       </main>
-
     </div>
   );
 }

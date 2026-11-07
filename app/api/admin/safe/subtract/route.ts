@@ -13,33 +13,33 @@ export const POST = auth(async function POST(req) {
   const body = await req.json();
   const { balance } = body;
 
-  const amount = Prisma.Decimal(balance);
   if (!balance) {
     return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
   }
 
-  if (amount.isZero()) return NextResponse.json({ message: "Amount cannot be zero."}, { status: 400 })
+  const amount = new Prisma.Decimal(balance);
+
+  if (amount.isZero() || amount.isNegative()) {
+    return NextResponse.json({ message: "Amount must be greater than zero." }, { status: 400 });
+  }
 
   try {
-
     const result = await prisma.safe.findFirst();
-    if (!result) {
-      await prisma.safe.create({
-        data: {
-            balance: Prisma.Decimal(0),
-        },
-      });
-    } else {
-      if (result.balance.lt(amount)) {
-        return NextResponse.json({ message: "Cannot subtract more than available balance" }, { status: 400 });
-      }
-      await prisma.safe.update({
-        where: { id: result.id },
-        data: {
-          balance: { decrement: amount },
-        },
-      });
+
+    // Se não existir cofre, o saldo é 0, logo não é possível subtrair nada
+    if (!result || result.balance.minus(amount).isNegative()) {
+      return NextResponse.json(
+        { message: "Cannot subtract more than available balance" },
+        { status: 400 }
+      );
     }
+
+    await prisma.safe.update({
+      where: { id: result.id },
+      data: {
+        balance: { decrement: amount },
+      },
+    });
   } catch (error) {
     console.error("Error subtracting safe balance:", error);
     return NextResponse.json({ message: "Error subtracting safe balance" }, { status: 500 });

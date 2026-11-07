@@ -13,6 +13,7 @@ import SafeAdjustModal from "@/components/safe-adjust-modal";
 
 type SafeInfo = {
   totalBalance: string;
+  totalUserBalances : string, 
   lastUpdate: string;
 };
 
@@ -25,6 +26,7 @@ export default function SafePage() {
   const [adjustModalOpen, setAdjustModalOpen] = useState(false);
   const [safeData, setSafeData] = useState<SafeInfo>({
     totalBalance: "0.00",
+    totalUserBalances : "0.00",
     lastUpdate: "",
   });
 
@@ -46,13 +48,14 @@ export default function SafePage() {
   }, []);
 
   const balanceValue = Number(safeData.totalBalance);
-  const isProfit = balanceValue > 0;
-  const isLoss = balanceValue < 0;
+  const balanceProfit = Number(safeData.totalBalance) - Number(safeData.totalUserBalances);
+  const isProfit = balanceProfit > 0;
+  const isLoss = balanceProfit < 0;
 
   // Configuração dinâmica do cartão de Lucro/Prejuízo
   const financialStatus = {
-    label: isProfit ? "Em Lucro" : isLoss ? "Em Prejuízo" : "Neutro",
-    val: euro.format(balanceValue),
+    label: isProfit ? "+ " + balanceProfit:isLoss ? balanceProfit : "0.0",
+    val: euro.format(balanceProfit),
     color: isProfit ? "text-emerald-600" : isLoss ? "text-rose-600" : "text-slate-600",
     bgColor: isProfit ? "bg-emerald-50" : isLoss ? "bg-rose-50" : "bg-slate-100",
     borderColor: isProfit ? "border-emerald-200" : isLoss ? "border-rose-200" : "border-slate-200",
@@ -105,7 +108,7 @@ export default function SafePage() {
           {/* Cartão 2: Estado Financeiro (Lucro vs Prejuízo) */}
           <div className={`bg-white p-5 rounded-2xl border ${financialStatus.borderColor} shadow-sm flex items-center justify-between`}>
             <div>
-              <span className="text-xs font-semibold text-slate-500">Balanço do Cofre</span>
+              <span className="text-xs font-semibold text-slate-500">Valor Disponível no Cofre</span>
               <div className={`text-xl md:text-2xl font-black ${financialStatus.color} mt-1 flex items-center gap-2`}>
                 {financialStatus.label}
               </div>

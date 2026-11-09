@@ -23,6 +23,8 @@ const euro = new Intl.NumberFormat("pt-PT", {
   currency: "EUR",
 });
 
+const formatAmount = (cents: number) => euro.format(cents / 100);
+
 export default function CatalogView({
   products,
   onConfirmarCompra,
@@ -74,7 +76,7 @@ export default function CatalogView({
                 </h3>
                 <div className="flex items-baseline justify-between mt-1.5">
                   <span className="text-sm md:text-base font-extrabold text-blue-600">
-                    {euro.format(prod.preco)}
+                    {formatAmount(prod.preco)}
                   </span>
                 </div>
               </div>
@@ -106,7 +108,7 @@ export default function CatalogView({
 
             {/* Preço */}
             <div className="text-2xl font-black text-blue-600">
-              {euro.format(produtoSelecionado.preco)}
+              {formatAmount(produtoSelecionado.preco)}
             </div>
 
             {/* Botões de Ação */}

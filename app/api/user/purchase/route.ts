@@ -18,7 +18,6 @@ export const POST = auth(async function POST(req) {
   const body = await req.json();
   const { p_id } = body;
   const userId = req.auth.user.id;
-  const userType = req.auth.user.type;
 
   if (!p_id) {
     return NextResponse.json({ message: "Missing required fields" }, { status: 400 });

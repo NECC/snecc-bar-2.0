@@ -35,6 +35,8 @@ const euro = new Intl.NumberFormat("pt-PT", {
   currency: "EUR",
 });
 
+const formatAmount = (cents: number) => euro.format(cents / 100);
+
 export default function Header(userInterface: UserInterface) {
     const pathname = usePathname()
     const abaAtiva = pathsToNames[pathname]
@@ -142,7 +144,7 @@ export default function Header(userInterface: UserInterface) {
                     )}
                 </span>
                 <span className="text-md font-semibold text-slate-500">
-                    Saldo: <strong className="text-blue-600 font-extrabold">{euro.format(user.saldo)}</strong>
+                    Saldo: <strong className="text-blue-600 font-extrabold">{formatAmount(user.saldo)}</strong>
                 </span>
                 </div>
     

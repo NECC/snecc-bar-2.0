@@ -10,7 +10,7 @@ datasource db {
  
 model User {
   id                  String                @id @default(cuid())
-  balance             Decimal               @default(0) @db.Decimal(10, 2)
+  balance             Int                   @default(0)
   email               String                @unique
   emailVerified       DateTime?
   image               String?
@@ -53,8 +53,8 @@ model Stock {
   id                String      @id @default(cuid())
   product_id        String
   quantity          Int
-  acquisition_cost  Decimal     @default(0) @db.Decimal(10, 2)
-  price       Decimal     @default(0) @db.Decimal(10, 2)
+  acquisition_cost  Int         @default(0)
+  price             Int          @default(0)
   createdAt         DateTime    @default(now())
   parcel_number     Int         @default(1)
   times_sold        PurchaseTransaction[]
@@ -67,7 +67,7 @@ model BalanceTransaction {
   id          String          @id @default(cuid())
   user_id     String
   type        TransactionType
-  amount      Decimal         @default(0) @db.Decimal(10, 2)
+  amount      Int             @default(0)
   handler_id  String
   date        DateTime        @default(now())
 
@@ -87,7 +87,7 @@ model PurchaseTransaction {
 
 model Safe {
   id            String      @id @default(cuid())
-  balance       Decimal     @default(0) @db.Decimal(10, 2)
+  balance       Int         @default(0)
   last_updated  DateTime    @default(now())
 }
 

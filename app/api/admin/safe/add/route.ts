@@ -13,12 +13,15 @@ export const POST = auth(async function POST(req) {
   const body = await req.json();
   const { balance } = body;
 
-  const amount = Prisma.Decimal(balance);
+  const amount = Number.parseFloat(balance) * 100;
+
   if (!balance) {
     return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
   }
 
-  if (amount.isZero()) return NextResponse.json({ message: "Amount cannot be zero."}, { status: 400 })
+  if (amount === 0) {
+    return NextResponse.json({ message: "Amount cannot be zero."}, { status: 400 });
+  }
 
   try {
 

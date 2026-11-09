@@ -37,7 +37,7 @@ export const GET = auth(async function GET(req) {
       user: transaction.user?.email ?? "Sem utilizador",
       handler: transaction.handler?.email ?? "Sistema",
       type: transaction.type,
-      amount: Number(transaction.amount),
+      amount: transaction.amount,
       date: transaction.date,
     }));
 
@@ -67,7 +67,7 @@ export const GET = auth(async function GET(req) {
     const purchase_formmated = purchaseTransactions.map((transaction) => ({
       id: transaction.id,
       user: transaction.user?.email ?? "Sem utilizador",
-      price: Number(transaction.product_v?.price ?? 0),
+      price: transaction.product_v?.price ?? 0,
       item: transaction.product_v?.product?.name ?? "Item indisponível",
       date: transaction.date,
     }));

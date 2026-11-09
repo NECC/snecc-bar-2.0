@@ -5,8 +5,8 @@ import { useState } from "react";
 
 export interface Stock {
   id: string;
-  price: string;
-  acquisition_cost: string;
+  price: number;
+  acquisition_cost: number;
   quantity: number;
   acquisition_date: string;
   lost: number;
@@ -27,6 +27,12 @@ interface ProductsViewProps {
   setProductId: (id: string | null) => void;
 }
 
+const euro = new Intl.NumberFormat("pt-PT", {
+  style: "currency",
+  currency: "EUR",
+});
+
+const formatAmount = (cents: number) => euro.format(cents / 100);
 
 export default function ProductsView({ products, setLostStockModalOpen, setProductId }: ProductsViewProps) {
 
@@ -106,8 +112,8 @@ export default function ProductsView({ products, setLostStockModalOpen, setProdu
                           <td className="py-1 pr-4">{stock.acquisition_date}</td>
                           <td className="py-1 pr-4">{stock.quantity}</td>
                           <td className="py-1 pr-4">{stock.lost}</td>
-                          <td className="py-1 pr-4">€{Number.parseFloat(stock.price).toFixed(2)}</td>
-                          <td className="py-1">€{Number.parseFloat(stock.acquisition_cost).toFixed(2)}</td>
+                          <td className="py-1 pr-4">{formatAmount(stock.price)}</td>
+                          <td className="py-1">{formatAmount(stock.acquisition_cost)}</td>
                         </tr>
                       ))}
                     </tbody>

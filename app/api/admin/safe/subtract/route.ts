@@ -11,30 +11,30 @@ export const POST = auth(async function POST(req) {
   const body = await req.json();
   const { balance } = body;
 
+  const amount = Number.parseFloat(balance) * 100;
+
   if (balance === undefined || balance === null || balance === "") {
     return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
   }
 
-  const amount = new Prisma.Decimal(balance);
-
-  if (amount.isZero() || amount.isNegative()) {
-    return NextResponse.json({ message: "Amount must be greater than zero." }, { status: 400 });
+  if (amount === 0 || amount < 0) {
+    return NextResponse.json({ message: "Amount must be a positive number." }, { status: 400 });
   }
 
   try {
     const safe = await prisma.safe.findFirst();
-    const safeBalance = safe ? safe.balance : new Prisma.Decimal(0);
+    const safeBalance = safe ? safe.balance : 0;
 
     // Somatório de saldos dos utilizadores
     const userBalanceAggregate = await prisma.user.aggregate({
       _sum: { balance: true },
     });
-    const totalUsersBalance = userBalanceAggregate._sum.balance ?? new Prisma.Decimal(0);
+    const totalUsersBalance = userBalanceAggregate._sum.balance ?? 0;
 
     // Saldo máximo permitido para retirar (sem afetar o dinheiro reservado aos users)
-    const maxSpendable = safeBalance.minus(totalUsersBalance);
+    const maxSpendable = safeBalance - totalUsersBalance;
 
-    if (amount.gt(maxSpendable)) {
+    if (amount > maxSpendable) {
       return NextResponse.json(
         { 
           message: `Não podes retirar mais do que a liquidez disponível (${maxSpendable.toFixed(2)}€). O restante dinheiro pertence aos utilizadores.` 

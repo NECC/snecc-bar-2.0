@@ -21,6 +21,8 @@ const euro = new Intl.NumberFormat("pt-PT", {
   currency: "EUR",
 });
 
+const formatAmount = (cents: number) => euro.format(cents / 100);
+
 export default function OrdersView({ compras }: OrdersViewProps) {
   const [subAba, setSubAba] = useState<"compras" | "saldo">("compras");
   const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
@@ -127,7 +129,7 @@ export default function OrdersView({ compras }: OrdersViewProps) {
                   {/* do Preço */}
                   <div className="text-right flex-shrink-0">
                     <span className="inline-block px-3 py-1.5 rounded-xl bg-rose-50 border border-rose-100 text-rose-700 font-black text-sm md:text-base">
-                      -{euro.format(item.price)}
+                      -{formatAmount(item.price)}
                     </span>
                   </div>
                 </div>

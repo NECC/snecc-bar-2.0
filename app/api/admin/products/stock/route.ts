@@ -31,8 +31,8 @@ export const POST = auth(async function POST(req) {
 
     const st = await prisma.stock.create({
         data: {
-            price: parseFloat(preco),
-            acquisition_cost: parseFloat(precoAquisicao),
+            price: parseFloat(preco) * 100,
+            acquisition_cost: parseFloat(precoAquisicao) * 100,
             quantity: parseInt(stock, 10),
             parcel_number: count + 1,
             product: {

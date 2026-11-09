@@ -24,6 +24,8 @@ const euro = new Intl.NumberFormat("pt-PT", {
   currency: "EUR",
 });
 
+const formatAmount = (cents: number) => euro.format(cents / 100);
+
 export default function TransactionsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState<"TODAS" | "Carregamento" | "Compra" | "Ajuste">("TODAS");
@@ -43,7 +45,7 @@ export default function TransactionsPage() {
         email: tx.user,
         item: null,
         type: tx.type == "RETIRAR" ? "Ajuste" : "Carregamento",
-        amount: euro.format(tx.amount),
+        amount: formatAmount(tx.amount),
         admin: tx.handler,
         date: new Date(tx.date).toLocaleString("pt-PT", {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'}),
         timestamp: new Date(tx.date).getTime(),
@@ -54,7 +56,7 @@ export default function TransactionsPage() {
         email: tx.user,
         item: tx.item,
         type: "Compra",
-        amount: euro.format(-tx.price),
+        amount: formatAmount(-tx.price),
         admin: null,
         date: new Date(tx.date).toLocaleString("pt-PT", {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'}),
         timestamp: new Date(tx.date).getTime(),

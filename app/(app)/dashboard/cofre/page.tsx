@@ -22,6 +22,8 @@ const euro = new Intl.NumberFormat("pt-PT", {
   currency: "EUR",
 });
 
+const formatAmount = (cents: number) => euro.format(cents / 100);
+
 export default function SafePage() {
   const [adjustModalOpen, setAdjustModalOpen] = useState(false);
   const [safeData, setSafeData] = useState<SafeInfo>({
@@ -54,8 +56,8 @@ export default function SafePage() {
 
   // Configuração dinâmica do cartão de Lucro/Prejuízo
   const financialStatus = {
-    label: isProfit ? "+ " + balanceProfit:isLoss ? balanceProfit : "0.0",
-    val: euro.format(balanceProfit),
+    val: formatAmount(balanceProfit),
+    label: isProfit ? "+ " + formatAmount(balanceProfit) : isLoss ? formatAmount(balanceProfit) : "0.0",
     color: isProfit ? "text-emerald-600" : isLoss ? "text-rose-600" : "text-slate-600",
     bgColor: isProfit ? "bg-emerald-50" : isLoss ? "bg-rose-50" : "bg-slate-100",
     borderColor: isProfit ? "border-emerald-200" : isLoss ? "border-rose-200" : "border-slate-200",
@@ -97,7 +99,7 @@ export default function SafePage() {
             <div>
               <span className="text-xs font-semibold text-slate-500">Saldo total no Cofre</span>
               <div className="text-xl md:text-2xl font-black text-slate-900 mt-1">
-                {euro.format(balanceValue)}
+                {formatAmount(balanceValue)}
               </div>
             </div>
             <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center flex-shrink-0">

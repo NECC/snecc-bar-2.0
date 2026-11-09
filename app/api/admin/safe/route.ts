@@ -27,9 +27,10 @@ export const GET = auth(async function GET(req) {
       },
     });
 
-    const totalUserBalances = userBalancesSum._sum.balance ?? Prisma.Decimal(0);
+    const totalUserBalances = userBalancesSum._sum.balance ?? new Prisma.Decimal(0);
 
     // 2. Disponível para compras = Saldo do Cofre - Saldo dos Utilizadores
+    const rawAvailable = safe.balance.minus(totalUserBalances);
     const availableForShopping = safe.balance.minus(totalUserBalances);
 
     return NextResponse.json({

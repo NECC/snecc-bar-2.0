@@ -108,7 +108,7 @@ export default function SafePage() {
           {/* Cartão 2: Estado Financeiro (Lucro vs Prejuízo) */}
           <div className={`bg-white p-5 rounded-2xl border ${financialStatus.borderColor} shadow-sm flex items-center justify-between`}>
             <div>
-              <span className="text-xs font-semibold text-slate-500">Valor Disponível no Cofre</span>
+              <span className="text-xs font-semibold text-slate-500">Valor Disponivel Para As Compras</span>
               <div className={`text-xl md:text-2xl font-black ${financialStatus.color} mt-1 flex items-center gap-2`}>
                 {financialStatus.label}
               </div>

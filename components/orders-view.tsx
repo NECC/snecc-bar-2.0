@@ -124,7 +124,7 @@ export default function OrdersView({ compras }: OrdersViewProps) {
                     </div>
                   </div>
 
-                  {/* Valor do Preço */}
+                  {/* do Preço */}
                   <div className="text-right flex-shrink-0">
                     <span className="inline-block px-3 py-1.5 rounded-xl bg-rose-50 border border-rose-100 text-rose-700 font-black text-sm md:text-base">
                       -{euro.format(item.price)}

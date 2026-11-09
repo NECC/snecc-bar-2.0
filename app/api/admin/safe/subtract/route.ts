@@ -4,16 +4,14 @@ import { NextResponse } from "next/server";
 import { Prisma } from "@/generated/prisma/client";
 
 export const POST = auth(async function POST(req) {
-  if (!req.auth) {
-    return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
-  } else if (req.auth.user?.type !== "ADMIN") {
-    return NextResponse.json({ message: "Only admins can subtract safe balance" }, { status: 403 });
+  if (!req.auth || req.auth.user?.type !== "ADMIN") {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 403 });
   }
 
   const body = await req.json();
   const { balance } = body;
 
-  if (!balance) {
+  if (balance === undefined || balance === null || balance === "") {
     return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
   }
 
@@ -24,26 +22,38 @@ export const POST = auth(async function POST(req) {
   }
 
   try {
-    const result = await prisma.safe.findFirst();
+    const safe = await prisma.safe.findFirst();
+    const safeBalance = safe ? safe.balance : new Prisma.Decimal(0);
 
-    // Se não existir cofre, o saldo é 0, logo não é possível subtrair nada
-    if (!result || result.balance.minus(amount).isNegative()) {
+    // Somatório de saldos dos utilizadores
+    const userBalanceAggregate = await prisma.user.aggregate({
+      _sum: { balance: true },
+    });
+    const totalUsersBalance = userBalanceAggregate._sum.balance ?? new Prisma.Decimal(0);
+
+    // Saldo máximo permitido para retirar (sem afetar o dinheiro reservado aos users)
+    const maxSpendable = safeBalance.minus(totalUsersBalance);
+
+    if (amount.gt(maxSpendable)) {
       return NextResponse.json(
-        { message: "Cannot subtract more than available balance" },
+        { 
+          message: `Não podes retirar mais do que a liquidez disponível (${maxSpendable.toFixed(2)}€). O restante dinheiro pertence aos utilizadores.` 
+        },
         { status: 400 }
       );
     }
 
     await prisma.safe.update({
-      where: { id: result.id },
+      where: { id: safe!.id },
       data: {
         balance: { decrement: amount },
+        last_updated: new Date(),
       },
     });
+
+    return NextResponse.json({ message: "Balance subtracted successfully" }, { status: 200 });
   } catch (error) {
     console.error("Error subtracting safe balance:", error);
     return NextResponse.json({ message: "Error subtracting safe balance" }, { status: 500 });
   }
-
-  return NextResponse.json({ message: "Balance subtracted successfully" }, { status: 200 });
 });

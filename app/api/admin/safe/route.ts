@@ -15,7 +15,7 @@ export const GET = auth(async function GET(req) {
     if (!safe) {
       safe = await prisma.safe.create({
         data: {
-          balance: Prisma.Decimal(0),
+          balance: 0,
         },
       });
     }
@@ -27,11 +27,10 @@ export const GET = auth(async function GET(req) {
       },
     });
 
-    const totalUserBalances = userBalancesSum._sum.balance ?? new Prisma.Decimal(0);
+    const totalUserBalances = userBalancesSum._sum.balance ?? 0;
 
     // 2. Disponível para compras = Saldo do Cofre - Saldo dos Utilizadores
-    const rawAvailable = safe.balance.minus(totalUserBalances);
-    const availableForShopping = safe.balance.minus(totalUserBalances);
+    const availableForShopping = safe.balance - totalUserBalances;
 
     return NextResponse.json({
       totalBalance: safe.balance.toString(),

@@ -17,6 +17,8 @@ const euro = new Intl.NumberFormat("pt-PT", {
   currency: "EUR",
 });
 
+const formatAmount = (cents: number) => euro.format(cents / 100);
+
 export default function UsersManagementPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState("");
@@ -163,7 +165,7 @@ export default function UsersManagementPage() {
                     {u.type !== "ADMIN" && (
                       <div className="text-right min-w-[70px] flex flex-row gap-2">
                         <div className="text-slate-400">Saldo:</div>
-                        <div className="font-extrabold text-slate-900">{euro.format(Number(u.balance))}</div>
+                        <div className="font-extrabold text-slate-900">{formatAmount(Number(u.balance))}</div>
                       </div>
                     )}
                   </div>

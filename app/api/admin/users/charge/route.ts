@@ -13,12 +13,15 @@ export const POST = auth(async function POST(req) {
   const body = await req.json();
   const { u_id, balance } = body;
 
-  const amount = Prisma.Decimal(balance);
+  console.log(typeof balance, balance);
+
+  const amount = Number.parseFloat(balance) * 100;
+
   if (!u_id || !balance) {
     return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
   }
 
-  if (amount.isZero()) return NextResponse.json({ message: "Balance cannot be zero."}, { status: 400 })
+  if (amount === 0) return NextResponse.json({ message: "Balance cannot be zero."}, { status: 400 })
 
   try {
     const user = await prisma.user.findUnique({
@@ -27,7 +30,7 @@ export const POST = auth(async function POST(req) {
 
     if (!user) throw new Error("User not found");
 
-    if (amount.lt(Prisma.Decimal(0)) && user.balance?.lt(amount.abs())) {
+    if (amount < 0 && user.balance < Math.abs(amount)) {
         return NextResponse.json({ message: "Cannot take more balance than available" }, { status: 400 });
     }
 
@@ -58,7 +61,7 @@ export const POST = auth(async function POST(req) {
                     }
                 },
                 amount: amount,
-                type: amount.gt(0) ? "CARREGAR" : "RETIRAR",
+                type: amount > 0 ? "CARREGAR" : "RETIRAR",
             }
         }),
         prisma.safe.update({

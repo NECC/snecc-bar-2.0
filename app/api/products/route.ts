@@ -44,7 +44,7 @@ export const GET = auth(async function GET(req) {
   const results = products.map(product => {
     return {
       id: product.id,
-      preco: product.stock[0].price.toFixed(2),
+      preco: product.stock[0].price,
       nome: product.name,
       imagem: product.image || "",
     };

@@ -23,8 +23,8 @@ export const POST = auth(async function POST(req) {
         image: imagem || null,
         stock: {
           create: {
-            price: parseFloat(preco),
-            acquisition_cost: parseFloat(precoAquisicao),
+            price: parseFloat(preco)*100,
+            acquisition_cost: parseFloat(precoAquisicao)*100,
             quantity: parseInt(stock, 10),
           },
         },
@@ -72,7 +72,7 @@ export const GET = auth(async function GET(req) {
       image: product.image || "",
       stock: product.stock.map(stock => ({
         id: stock.id,
-        price: stock.price.toFixed(2),
+        price: stock.price,
         acquisition_cost: stock.acquisition_cost,
         quantity: stock.quantity,
         acquisition_date: stock.createdAt.toLocaleDateString("pt-PT"),

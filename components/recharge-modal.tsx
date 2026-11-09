@@ -25,6 +25,8 @@ const euro = new Intl.NumberFormat("pt-PT", {
   currency: "EUR",
 });
 
+const formatAmount = (cents: number) => euro.format(cents / 100);
+
 export default function RechargeModal({
   isOpen,
   onClose,
@@ -172,7 +174,7 @@ export default function RechargeModal({
                         </div>
                       </div>
                       <div className="text-xs font-extrabold text-slate-700 flex-shrink-0">
-                        {euro.format(Number(u.balance ?? 0))}
+                        {formatAmount(Number(u.balance ?? 0))}
                       </div>
                     </button>
                   ))
@@ -211,7 +213,7 @@ export default function RechargeModal({
               <div className="text-right flex-shrink-0">
                 <div className="text-[10px] text-slate-400">Saldo Atual</div>
                 <div className="text-xs font-black text-blue-600">
-                  {euro.format(Number(selectedUser.balance ?? 0))}
+                  {formatAmount(Number(selectedUser.balance ?? 0))}
                 </div>
               </div>
             </div>

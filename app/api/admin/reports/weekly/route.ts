@@ -59,11 +59,13 @@ export const GET = auth(async function GET(req) {
       { dateObj: Date; profit: Prisma.Decimal; losses: Prisma.Decimal }
     >();
 
-    // 3. Acumular Lucros (Vendas)
+    // 3. Acumular Lucros (Vendas) -> Converte cêntimos para Euros dividindo por 100
     for (const purchase of purchases) {
       const targetDate = period === "weekly" ? getFridayOfWeek(purchase.date) : new Date(purchase.date);
       const key = formatDateKey(targetDate);
-      const price = purchase.product_v?.price ?? new Prisma.Decimal(0);
+      
+      const rawPrice = purchase.product_v?.price ?? new Prisma.Decimal(0);
+      const priceInEuros = new Prisma.Decimal(rawPrice).div(100);
 
       if (!map.has(key)) {
         map.set(key, {
@@ -74,17 +76,16 @@ export const GET = auth(async function GET(req) {
       }
 
       const current = map.get(key)!;
-      current.profit = current.profit.add(price);
+      current.profit = current.profit.add(priceInEuros);
     }
 
-    // 4. Acumular Perdas (Lotes com unidades perdidas)
+    // 4. Acumular Perdas (Lotes com unidades perdidas) -> Converte custo em cêntimos para Euros dividindo por 100
     for (const stock of stocksWithLosses) {
       const targetDate = period === "weekly" ? getFridayOfWeek(stock.createdAt) : new Date(stock.createdAt);
       const key = formatDateKey(targetDate);
 
-      // Instanciação explícita como Prisma.Decimal para evitar o TypeError de .mul()
-      const acquisitionCost = new Prisma.Decimal(stock.acquisition_cost);
-      const totalLoss = acquisitionCost.mul(stock.lost);
+      const rawCost = new Prisma.Decimal(stock.acquisition_cost);
+      const totalLossInEuros = rawCost.div(100).mul(stock.lost);
 
       if (!map.has(key)) {
         map.set(key, {
@@ -95,7 +96,7 @@ export const GET = auth(async function GET(req) {
       }
 
       const current = map.get(key)!;
-      current.losses = current.losses.add(totalLoss);
+      current.losses = current.losses.add(totalLossInEuros);
     }
 
     // 5. Converter o Map num Array ordenado por data descendente (mais recentes primeiro)

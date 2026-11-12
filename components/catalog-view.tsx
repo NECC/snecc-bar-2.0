@@ -1,7 +1,7 @@
 "use client";
 
 import { Dispatch, SetStateAction } from "react";
-import { Check, X, ArrowRight } from "lucide-react";
+import { Boxes, X, ArrowRight } from "lucide-react";
 
 export interface Product {
   id: string;
@@ -92,11 +92,15 @@ export default function CatalogView({
             
             {/* Imagem do Produto */}
             <div className="w-28 h-28 bg-slate-50 rounded-2xl p-2 border border-slate-100 flex items-center justify-center overflow-hidden">
-              <img
-                src={produtoSelecionado.imagem}
-                alt={produtoSelecionado.nome}
-                className="w-full h-full object-cover rounded-xl"
-              />
+              {produtoSelecionado.imagem ? (
+                <img
+                  src={produtoSelecionado.imagem}
+                  alt={produtoSelecionado.nome}
+                  className="w-full h-full object-cover rounded-xl"
+                />
+              ) : (
+                <Boxes className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 font-extrabold flex items-center justify-center flex-shrink-0" />
+              )}
             </div>
 
             {/* Nome do Produto */}

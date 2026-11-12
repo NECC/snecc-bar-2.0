@@ -37,21 +37,25 @@ export const GET = auth(async function GET(req) {
     const purchases = await prisma.purchaseTransaction.findMany({
       include: {
         product_v: {
-          select: { price: true },
+          select: { 
+            price: true,
+            acquisition_cost: true,
+          },
         },
       },
       orderBy: { date: "asc" },
     });
 
-    // 2. Obter todos os lotes de stock que têm unidades registradas como perdidas
-    const stocksWithLosses = await prisma.stock.findMany({
-      where: { lost: { gt: 0 } },
+    // 2. Obter todas as perdas registadas, com o custo de aquisição do stock associado
+    const losses = await prisma.stockLoss.findMany({
       select: {
-        lost: true,
-        acquisition_cost: true,
-        createdAt: true,
+        quantity: true,
+        date: true,
+        stock: {
+          select: { acquisition_cost: true },
+        },
       },
-      orderBy: { createdAt: "asc" },
+      orderBy: { date: "asc" },
     });
 
     const map = new Map<
@@ -64,7 +68,7 @@ export const GET = auth(async function GET(req) {
       const targetDate = period === "weekly" ? getFridayOfWeek(purchase.date) : new Date(purchase.date);
       const key = formatDateKey(targetDate);
       
-      const rawPrice = purchase.product_v?.price ?? new Prisma.Decimal(0);
+      const rawPrice = (purchase.product_v?.price ?? new Prisma.Decimal(0)) - (purchase.product_v?.acquisition_cost ?? new Prisma.Decimal(0));
       const priceInEuros = new Prisma.Decimal(rawPrice).div(100);
 
       if (!map.has(key)) {
@@ -80,12 +84,13 @@ export const GET = auth(async function GET(req) {
     }
 
     // 4. Acumular Perdas (Lotes com unidades perdidas) -> Converte custo em cêntimos para Euros dividindo por 100
-    for (const stock of stocksWithLosses) {
-      const targetDate = period === "weekly" ? getFridayOfWeek(stock.createdAt) : new Date(stock.createdAt);
+    for (const loss of losses) {
+      const targetDate = period === "weekly" ? getFridayOfWeek(loss.date) : new Date(loss.date);
       const key = formatDateKey(targetDate);
 
-      const rawCost = new Prisma.Decimal(stock.acquisition_cost);
-      const totalLossInEuros = rawCost.div(100).mul(stock.lost);
+      const totalLossInEuros = new Prisma.Decimal(loss.stock.acquisition_cost)
+        .div(100)
+        .mul(loss.quantity);
 
       if (!map.has(key)) {
         map.set(key, {

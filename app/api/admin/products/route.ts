@@ -69,7 +69,7 @@ export const GET = auth(async function GET(req) {
     return {
       id: product.id,
       name: product.name,
-      image: product.image || "",
+      image: product.image,
       stock: product.stock.map(stock => ({
         id: stock.id,
         price: stock.price,

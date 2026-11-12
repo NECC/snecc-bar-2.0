@@ -11,6 +11,11 @@ export interface LostProduct {
     totalStock: number;
 }
 
+const reasons = [
+  { value: "OTHER", label: "Outro" },
+    { value: "EXPIRED", label: "Fora de Validade" },
+];
+
 interface LostStockModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -28,6 +33,7 @@ export default function LostStockModal({
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
   const [multiple, setMultiple] = useState(false);
+  const [reason, setReason] = useState("OTHER");
 
   if (!isOpen) return null;
 
@@ -46,7 +52,7 @@ export default function LostStockModal({
       const response = await fetch("/api/admin/products/stock/losses", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ p_id: product?.id, lost: amount }),
+        body: JSON.stringify({ p_id: product?.id, lost: amount, reason }),
       });
 
       const data = await response.json().catch(() => ({}));
@@ -112,6 +118,22 @@ export default function LostStockModal({
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                Razão da Perda  
+              </label>
+
+              <select
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-blue-600 focus:bg-white transition"
+              >
+                {reasons.map((r) => (
+                  <option key={r.value} value={r.value}>
+                    {r.label}
+                  </option>
+                ))}
+              </select>
+
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">
                 Quantidade a Remover
               </label>
 
@@ -144,7 +166,7 @@ export default function LostStockModal({
               <button
                 type="submit"
                 disabled={loading || !amount}
-                className="bg-rose-600 hover:bg-rose-700 w-2/3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md shadow-emerald-200 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-rose-600 hover:bg-rose-700 w-2/3 text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md shadow-rose-400 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading && (
                   <Loader2 className="w-4 h-4 animate-spin" />

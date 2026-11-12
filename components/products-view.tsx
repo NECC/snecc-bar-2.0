@@ -1,6 +1,6 @@
 "use client";
 
-import { TextAlignJustify, Minus } from "lucide-react";
+import { TextAlignJustify, Minus, Boxes } from "lucide-react";
 import { useState } from "react";
 
 export interface Stock {
@@ -49,11 +49,15 @@ export default function ProductsView({ products, setLostStockModalOpen, setProdu
               <div className="py-4 flex items-center justify-between gap-4 text-xs">
                 <div className="flex items-center gap-4 min-w-0 flex-1">
                   <div className="relative w-28 h-20 md:w-36 md:h-24 shrink-0 rounded-xl overflow-hidden flex items-center justify-center p-2">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="object-contain w-full h-full"
-                    />
+                    {product.image ? (
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="object-contain w-full h-full"
+                      />
+                    ) : (
+                      <Boxes className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 font-extrabold flex items-center justify-center flex-shrink-0" />
+                    )}
                   </div>
 
                   <div> 

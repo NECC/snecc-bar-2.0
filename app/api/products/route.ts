@@ -46,7 +46,7 @@ export const GET = auth(async function GET(req) {
       id: product.id,
       preco: product.stock[0].price,
       nome: product.name,
-      imagem: product.image || "",
+      imagem: product.image,
     };
   });
 

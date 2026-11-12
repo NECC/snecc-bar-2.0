@@ -10,76 +10,69 @@ export const POST = auth(async function POST(req) {
   }
 
   const body = await req.json();
-  const { p_id, lost } = body;
+  const { p_id, lost, reason } = body;
   let remainingLoss = parseInt(lost);
 
-  if (!p_id || !lost) {
+  if (!p_id || !lost || !reason ) {
     return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
   }
+const handlerId = req.auth.user.id;
 
   try {
-    const quantity = await prisma.stock.aggregate({
-      where: { 
-        product_id: p_id,
-        quantity: {
-          gt: 0,
-        } 
-      },
-      _sum: {
-        quantity: true,
-      },
-    });
+    await prisma.$transaction(
+      async (tx) => {
+        // Read all stock batches inside the transaction, oldest first (FIFO)
+        const batches = await tx.stock.findMany({
+          where: { product_id: p_id, quantity: { gt: 0 } },
+          orderBy: { createdAt: "asc" },
+        });
 
-    if (!quantity._sum.quantity || quantity._sum.quantity <= 0) {
-      return NextResponse.json({ message: "No stock found for the given product" }, { status: 404 });
-    }
-      
-    if (quantity._sum.quantity < remainingLoss) {
-      return NextResponse.json({ message: "Loss is bigger than available stock" }, { status: 400 });
-    }
-
-    while (remainingLoss > 0) {
-      const st = await prisma.stock.findFirst({
-        where: { 
-          product_id: p_id,
-          quantity: {
-            gt: 0,
-          } 
-        },
-        orderBy: { createdAt: 'asc' },
-      });
-
-      if (st) {
-        if (st.quantity >= remainingLoss) {
-          await prisma.stock.update({
-            where: { id: st.id },
-            data: {
-              quantity: {
-                decrement: remainingLoss
-              },
-              lost: {
-                increment: remainingLoss
-              },
-            }
-          });
-          remainingLoss = 0;
-
-        } else {
-          await prisma.stock.update({
-            where: { id: st.id },
-            data: {
-              quantity: {
-                decrement: st.quantity
-              },
-              lost: {
-                increment: st.quantity
-              },
-            }
-          });
-          remainingLoss -= st.quantity;
+        const available = batches.reduce((sum, b) => sum + b.quantity, 0);
+        if (available <= 0) {
+          throw NextResponse.json({ message: "No stock found for the given product" }, { status: 404 });
         }
-      } else break; // No more stock to process
-    }
+        if (available < lost) {
+          throw NextResponse.json({ message: "Loss is bigger than available stock" }, { status: 400 });
+        }
+
+        let remaining = lost;
+
+        for (const batch of batches) {
+          if (remaining <= 0) break;
+
+          const take = Math.min(batch.quantity, remaining);
+
+          await tx.stock.update({
+            where: { id: batch.id },
+            data: {
+              quantity: { decrement: take },
+              lost: { increment: take },
+            },
+          });
+
+          await tx.stockLoss.create({
+            data: {
+              quantity: take,
+              reason: reason,
+              stock: {
+                connect: {
+                  id: batch.id,
+                },
+              },
+              handler: {
+                connect: {
+                  id: handlerId,
+                },
+              }
+            },
+          });
+
+          remaining -= take;
+        }
+      },
+      { isolationLevel: "Serializable" }
+    );
+
 
   } catch (error) {
     console.error("Error registering loss:", error);

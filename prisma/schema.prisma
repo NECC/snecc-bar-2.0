@@ -18,6 +18,7 @@ model User {
   sessions            Session[]
   transactions        BalanceTransaction[]  @relation("UserAffected")
   handledTransactions BalanceTransaction[]  @relation("Handler")
+  handledLosses       StockLoss[]           @relation("LossHandler")
   purchases           PurchaseTransaction[] @relation("UserPurchases")
  
   createdAt           DateTime              @default(now())
@@ -50,17 +51,30 @@ model Product {
 }
 
 model Stock {
-  id                String      @id @default(cuid())
+  id                String                @id @default(cuid())
   product_id        String
   quantity          Int
-  acquisition_cost  Int         @default(0)
-  price             Int          @default(0)
-  createdAt         DateTime    @default(now())
-  parcel_number     Int         @default(1)
+  acquisition_cost  Int                   @default(0)
+  price             Int                   @default(0)
+  createdAt         DateTime              @default(now())
+  parcel_number     Int                   @default(1)
   times_sold        PurchaseTransaction[]
-  lost              Int        @default(0)
+  lost              Int                   @default(0)
 
-  product           Product   @relation(fields: [product_id], references: [id])
+  product           Product               @relation(fields: [product_id], references: [id])
+  losses            StockLoss[]
+}
+
+model StockLoss {
+  id          String      @id @default(cuid())
+  stock_id    String
+  quantity    Int         @default(1)
+  reason      LossReason?
+  handler_id  String
+  date        DateTime    @default(now())
+
+  stock       Stock       @relation(fields: [stock_id], references: [id])
+  handler     User        @relation("LossHandler", fields: [handler_id], references: [id])
 }
 
 model BalanceTransaction {
@@ -99,4 +113,9 @@ enum Roles {
 enum TransactionType {
   CARREGAR
   RETIRAR
+}
+
+enum LossReason {
+  EXPIRED
+  OTHER
 }

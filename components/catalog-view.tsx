@@ -66,7 +66,7 @@ export default function CatalogView({
                 <img
                   src={prod.imagem}
                   alt={prod.nome}
-                  className="object-contain w-full h-full group-hover:scale-105 transition-transform duration-300"
+                  className="object-contain w-full h-full group-hover:scale-105 transition-transform duration-300 bg-white"
                 />
               </div>
 

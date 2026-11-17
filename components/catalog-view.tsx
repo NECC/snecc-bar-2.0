@@ -66,7 +66,7 @@ export default function CatalogView({
                 <img
                   src={prod.imagem}
                   alt={prod.nome}
-                  className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                  className="object-contain w-full h-full group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
 
@@ -96,7 +96,7 @@ export default function CatalogView({
                 <img
                   src={produtoSelecionado.imagem}
                   alt={produtoSelecionado.nome}
-                  className="w-full h-full object-cover rounded-xl"
+                  className="w-full h-full object-contain rounded-xl"
                 />
               ) : (
                 <Boxes className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 font-extrabold flex items-center justify-center flex-shrink-0" />

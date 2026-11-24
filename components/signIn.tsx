@@ -11,14 +11,14 @@ export default function SignIn() {
       className="flex flex-col gap-4 w-full"
     >
       {/* Aviso sobre o email a utilizar */}
-      <div className="flex items-start gap-3 bg-blue-50 border border-blue-100 rounded-xl p-3.5">
+      <div className="flex items-center gap-3 bg-blue-50 border border-blue-100 rounded-xl p-3.5">
         <div className="w-8 h-8 rounded-xl bg-white text-blue-600 flex items-center justify-center flex-shrink-0 shadow-sm">
           <Info className="w-4 h-4" />
         </div>
-        <p className="text-xs text-slate-600 font-medium leading-relaxed">
-          Usa a <span className="font-bold text-blue-700">conta pessoal</span> ,
+        <p className="flex-1 text-center text-xs text-slate-600 font-medium leading-relaxed">
+          Usa a <span className="font-bold text-blue-700">conta pessoal</span>,
           não utilizar email{" "}
-          <span className="font-bold text-blue-700">institucional</span> .
+          <span className="font-bold text-blue-700">institucional</span>.
         </p>
       </div>
 

@@ -1,5 +1,5 @@
 import { signIn } from "@/auth";
-import { Mail, ArrowRight } from "lucide-react";
+import { Mail, ArrowRight, Info } from "lucide-react";
 
 export default function SignIn() {
   return (
@@ -10,6 +10,17 @@ export default function SignIn() {
       }}
       className="flex flex-col gap-4 w-full"
     >
+      {/* Aviso sobre o email a utilizar */}
+      <div className="flex items-start gap-3 bg-blue-50 border border-blue-100 rounded-xl p-3.5">
+        <div className="w-8 h-8 rounded-xl bg-white text-blue-600 flex items-center justify-center flex-shrink-0 shadow-sm">
+          <Info className="w-4 h-4" />
+        </div>
+        <p className="text-xs text-slate-600 font-medium leading-relaxed">
+          Usa o <span className="font-bold text-blue-700">email pessoal</span>{" "}
+          que associaste à tua inscrição de sócio do NECC.
+        </p>
+      </div>
+
       {/* Campo de Entrada de Email */}
       <div className="flex flex-col gap-1.5">
         <label
@@ -25,7 +36,7 @@ export default function SignIn() {
             name="email"
             type="email"
             required
-            placeholder="a1111@alunos.uminho.com"
+            placeholder="o.teu.email@exemplo.com"
             className="w-full bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-xs text-slate-800 placeholder:text-slate-400 font-medium focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition shadow-sm"
           />
         </div>

@@ -16,8 +16,9 @@ export default function SignIn() {
           <Info className="w-4 h-4" />
         </div>
         <p className="text-xs text-slate-600 font-medium leading-relaxed">
-          Usa a <span className="font-bold text-blue-700">conta pessoal</span>{" "}
-          que associaste à tua inscrição de sócio do NECC.
+          Usa a <span className="font-bold text-blue-700">conta pessoal</span> ,
+          não utilizar email{" "}
+          <span className="font-bold text-blue-700">institucional</span> .
         </p>
       </div>
 

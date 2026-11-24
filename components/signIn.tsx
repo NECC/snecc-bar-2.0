@@ -16,7 +16,7 @@ export default function SignIn() {
           <Info className="w-4 h-4" />
         </div>
         <p className="text-xs text-slate-600 font-medium leading-relaxed">
-          Usa o <span className="font-bold text-blue-700">email pessoal</span>{" "}
+          Usa a <span className="font-bold text-blue-700">conta pessoal</span>{" "}
           que associaste à tua inscrição de sócio do NECC.
         </p>
       </div>
@@ -36,7 +36,7 @@ export default function SignIn() {
             name="email"
             type="email"
             required
-            placeholder="o.teu.email@exemplo.com"
+            placeholder="turing@gmail.com"
             className="w-full bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-xs text-slate-800 placeholder:text-slate-400 font-medium focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition shadow-sm"
           />
         </div>

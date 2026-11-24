@@ -15,7 +15,7 @@ export default function SignIn() {
         <div className="w-8 h-8 rounded-xl bg-white text-blue-600 flex items-center justify-center flex-shrink-0 shadow-sm">
           <Info className="w-4 h-4" />
         </div>
-        <p className="flex-1 text-center text-xs text-slate-600 font-medium leading-relaxed">
+        <p className="flex-1 text-start text-xs text-slate-600 font-medium leading-relaxed">
           Usa a <span className="font-bold text-blue-700">conta pessoal</span>,
           não utilizar email{" "}
           <span className="font-bold text-blue-700">institucional</span>.
